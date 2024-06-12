@@ -1,0 +1,31 @@
+# 06-06-2024
+# alex
+
+OBJ = vector.so solar.so evol.so # Objectes
+ICC = /opt/intel/oneapi/compiler/2024.0/bin/icx  # Compilador C intel
+# Per al compilador d'intel primer:
+# $ export LD_LIBRARY_PATH="/opt/intel/oneapi/compiler/latest/lib:/usr/local/lib"
+GCC = gcc # Compilador C gnu
+COM = $(GCC)
+LIB = -lm -lquadmath # Llibreries (-l*, -L*, -I*)
+AVS = -W -Wall -Wextra -pedantic # -ansi no funciona amb -lquadmath
+OPT = -march=native -O2 --fast-math -pipe -std=c17 -shared -fPIC # Optimitzacio
+OPC = $(OPT) $(AVS) # Opcions
+
+all: $(OBJ)
+
+vector.so: vector.c vector.h
+	@echo Compilant $<
+	$(COM) $(OPC) $< -o $@ $(LIB)
+
+solar.so: solar.c solar.h vector.h
+	@echo Compilant $<
+	$(COM) $(OPC) $< -o $@ $(LIB)
+
+evol.so: evol.c evol.h vector.h solar.h
+	@echo Compilant $<
+	$(COM) $(OPC) $< -o $@ $(LIB)
+
+clean:
+	@echo Netejant...
+	rm -rf $(OBJ) *~
