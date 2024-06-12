@@ -5,61 +5,86 @@
 #include <stdlib.h>
 #include "vector.h"
 
-real dot(real * v1, real * v2) {
+quad dot(quad * v1, quad * v2) {
   int i;
-  real ret = 0.0;
+  quad ret = 0.0;
   for (i = 0; i < 3; i++)
     ret += v1[i]*v2[i];
   return ret;
 }
 
-void copy(real * v1, real * v2, int tam) {
+void copy(quad * v1, quad * v2, int tam) {
   int i;
   for (i = 0; i < tam; i++)
     v1[i] = v2[i];
 }
 
-void adjunt(real * v1, real * v2, int tam) {
+void adjunt(quad * v1, quad * v2, int tam) {
   int i;
   for (i = 0; i < tam; i++)
     v1[i] = -v2[tam - 1 - i];
 }
 
-real suma(real * v1, int tam) {
+quad suma(quad * v1, int tam) {
   int i;
-  real s = 0.0L;
+  quad s = 0.0;
   for (i = 0; i < tam; i++)
     s += v1[i];
   return s;
 }
 
-void zeros(real * v1, int tam) {
+void zeros(quad * v1, int tam) {
   int i;
   for (i = 0; i < tam; i++)
-    v1[i] = 0.0L;
+    v1[i] = 0.0;
 }
 
-real difnorm2(real * v1, real * v2, int tam) {
+quad difnorm2(quad * v1, quad * v2, int tam) {
   int i;
-  real nu = 0.0L, de = 0.0L;
+  quad nu = 0.0, de = 0.0;
   for (i = 0; i < tam; i++) {
     nu += (v1[i] - v2[i])*(v1[i] - v2[i]);
     de += v2[i]*v2[i];
   }
-  return sqrtl(nu/de);
+  return sqrtq(nu/de);
 }
 
-void printV(real * v1, const char * nom, int tam) {
+void printV(quad * v1, const char * nom, int tam) {
   int i;
   printf("%s = {", nom);
   for (i = 0; i < tam - 1; i++) {
     if (i % 5 == 0)
       printf("\n  ");    
-    printf("%02d => %Le, ", i, v1[i]);
+    printf("%02d => %Qe, ", i, v1[i]);
 
   }
   if ((tam - 1) % 5 == 0)
     printf("\n  "); 
-  printf("%02d => %Le\n}\n", tam - 1, v1[tam - 1]);
+  printf("%02d => %Qe\n}\n", tam - 1, v1[tam - 1]);
   
+}
+
+quad real2quad(real v1) {
+  char num[26];
+  sprintf(num, "%.19Le", v1);
+  //printf("%s\n", num);
+  return strtoflt128 (num, NULL);
+}
+
+real quad2real(quad v1) {
+  char num[41];
+  sprintf(num, "%.34Qe", v1);
+  return atof(num);
+}
+
+void real2quadV(quad * v1, real * v2, int tam) {
+  int i;
+  for (i = 0; i < tam; i++)
+    v1[i] = real2quad(v2[i]);  
+}
+
+void quad2realV(real * v1, quad * v2, int tam) {
+  int i;
+  for (i = 0; i < tam; i++)
+    v1[i] = quad2real(v2[i]);
 }

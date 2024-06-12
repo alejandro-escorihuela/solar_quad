@@ -10,18 +10,18 @@
 #include "vector.h"
 #include "solar.h"
 
-typedef void (* fluxe) (real *, real *, real *, real, int);
-typedef real (* qcons) (real *, real *, int);
+typedef void (* fluxe) (quad *, quad *, quad *, quad, int);
+typedef quad (* qcons) (quad *, quad *, int);
 
-void psc(fluxe phi, real * z, real * e, real * params, real h, int np);
-void pasABA(real * z, real * e, real * params, int np, real h, real * a, real * b, int s, fluxe pA, fluxe pB);
-void pasAB(real * z, real * e, real * params, int np, real h, real * x, real * y, int sp, fluxe pA, fluxe pB);
-void pasBA(real * z, real * e, real * params, int np, real h, real * x, real * y, int sp, fluxe pA, fluxe pB);
-void evolABAsc(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, fluxe pA, fluxe pB, qcons hH, real * maxerH);
+void psc(fluxe phi, quad * z, quad * e, quad * params, quad h, int np);
+void pasABA(quad * z, quad * e, quad * params, int np, quad h, quad * a, quad * b, int s, fluxe pA, fluxe pB);
+void pasAB(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
+void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
+
 /* Input/Output: */
 /*   z: coordenades q i p */
 /* Input: */
-/*   params: parametres reals, en el cas solar les masses */
+/*   params: parametres quads, en el cas solar les masses */
 /*   np: dimensió de params, en el cas solar nombre de planetes */
 /*   h: grandària de pas */
 /*   a, b: coeficients a i b */
@@ -32,8 +32,8 @@ void evolABAsc(real * z, real * params, int np, int Nm, real h, real * a, real *
 /* Output: */
 /*   maxerH: màxim error de la quatitat conservada */
 /* Queda pendent escriure en fitxers per veure l'evolució de les z */
-
-void evolABAsolar_errH(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * erH);
-void evolABAsolar_errQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * erH);
-void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * erH, real * erQ);
+void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH);
+void evolABAsolar_errH(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH);
+void evolABAsolar_errQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH);
+void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH, real * lerQ);
 #endif
