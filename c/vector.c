@@ -67,8 +67,7 @@ void printV(quad * v1, const char * nom, int tam) {
 quad real2quad(real v1) {
   char num[26];
   sprintf(num, "%.19Le", v1);
-  //printf("%s\n", num);
-  return strtoflt128 (num, NULL);
+  return strtoflt128(num, NULL);
 }
 
 real quad2real(quad v1) {
@@ -87,4 +86,26 @@ void quad2realV(real * v1, quad * v2, int tam) {
   int i;
   for (i = 0; i < tam; i++)
     v1[i] = quad2real(v2[i]);
+}
+
+quad str2quad(const char * v1) {
+  return strtoflt128(v1, NULL);
+}
+
+const char * quad2str(quad v1) {
+  char * cad = malloc(41 * sizeof(char *));
+  sprintf(cad, "%.34Qe", v1);
+  return cad;
+}
+
+void str2quadV(quad * v1, const char ** v2, int tam) {
+  int i;
+  for (i = 0; i < tam; i++)
+    v1[i] = str2quad(v2[i]);  
+}
+
+void quad2strV(const char ** v1, quad * v2, int tam) {
+  int i;
+  for (i = 0; i < tam; i++)
+    strcpy(v1[i], quad2str(v2[i]));
 }

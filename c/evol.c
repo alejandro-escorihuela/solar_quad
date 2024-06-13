@@ -75,7 +75,7 @@ void evolABAsolar_errH(real * z, real * params, int np, int Nm, real h, real * a
   int tam = np*3*2;
   quad zq[tam], paramsq[np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
   quad err;
-  
+
   hq = real2quad(h);
   real2quadV(zq, z, tam);
   real2quadV(paramsq, params, np);
@@ -99,7 +99,7 @@ void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * 
   int tam = np*3*2;
   quad meh, meq, zt[tam];
   quad zq[tam], paramsq[np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
-
+  
   hq = real2quad(h);
   real2quadV(zq, z, tam);
   real2quadV(paramsq, params, np);

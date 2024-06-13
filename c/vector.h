@@ -5,6 +5,7 @@
 #define _VECTOR_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <quadmath.h>
 
@@ -24,4 +25,8 @@ quad real2quad(real v1);
 real quad2real(quad v1);
 void real2quadV(quad * v1, real * v2, int tam); /* v1 <- quad(v2) */
 void quad2realV(real * v1, quad * v2, int tam); /* v1 <- real(v2) */
+quad str2quad(const char * v1);
+const char * quad2str(quad v1);
+void str2quadV(quad * v1, const char ** v2, int tam);
+void quad2strV(const char ** v1, quad * v2, int tam);
 #endif
