@@ -53,14 +53,29 @@ void printV(quad * v1, const char * nom, int tam) {
   int i;
   printf("%s = {", nom);
   for (i = 0; i < tam - 1; i++) {
-    if (i % 5 == 0)
+    if (i % 3 == 0)
       printf("\n  ");    
-    printf("%02d => %Qe, ", i, v1[i]);
+    printf("%02d => %.34Qe, ", i, v1[i]);
 
   }
-  if ((tam - 1) % 5 == 0)
+  if ((tam - 1) % 3 == 0)
     printf("\n  "); 
-  printf("%02d => %Qe\n}\n", tam - 1, v1[tam - 1]);
+  printf("%02d => %.34Qe\n}\n", tam - 1, v1[tam - 1]);
+  
+}
+
+void printV_str(const char ** v1, const char * nom, int tam) {
+  int i;
+  printf("%s = {", nom);
+  for (i = 0; i < tam - 1; i++) {
+    if (i % 3 == 0)
+      printf("\n  ");    
+    printf("%02d => %s, ", i, v1[i]);
+
+  }
+  if ((tam - 1) % 3 == 0)
+    printf("\n  "); 
+  printf("%02d => %s\n}\n", tam - 1, v1[tam - 1]);
   
 }
 
@@ -93,7 +108,8 @@ quad str2quad(const char * v1) {
 }
 
 const char * quad2str(quad v1) {
-  char * cad = malloc(41 * sizeof(char *));
+  //char cad[41];
+  char * cad = malloc(71 * sizeof(char *));
   sprintf(cad, "%.34Qe", v1);
   return cad;
 }
@@ -104,7 +120,7 @@ void str2quadV(quad * v1, const char ** v2, int tam) {
     v1[i] = str2quad(v2[i]);  
 }
 
-void quad2strV(const char ** v1, quad * v2, int tam) {
+void quad2strV(char ** v1, quad * v2, int tam) {
   int i;
   for (i = 0; i < tam; i++)
     strcpy(v1[i], quad2str(v2[i]));

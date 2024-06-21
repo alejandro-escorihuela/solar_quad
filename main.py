@@ -21,7 +21,7 @@ from evol import *
 if __name__ == "__main__":
     titols = "Sistema Solar BC"
     T = 1e4
-    N = (10**np.linspace(0.1, 3.5, 25)).astype(int)
+    N = (10**np.linspace(1.5, 5.5, 25)).astype(int)
     zini = iniSS()    
         
     errkv, navav = [], []
@@ -43,7 +43,7 @@ if __name__ == "__main__":
                 errkv_e.append(lerH)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)
-                print("NIA[%02d] = %12.12s -> (ex = %03d/%03d, s = %02d, h = %e, Nm = %05d, Nava = %05d, s/h = %.4e, Tf = %.3e, log10(erH) = %7.3f, log10(erQ) = %7.3f)"
+                print("NIA[%02d] = %12.12s -> (ex = %03d/%03d, s = %02d, h = %e, Nm = %05d, Nava = %07d, s/h = %.4e, Tf = %.3e, log10(erH) = %7.3f, log10(erQ) = %7.3f)"
                       % (rk, noms[rk % len(noms)], i + 1, len(N), s, h, Nm, s*Nm, s/h, h*Nm, lerH, lerQ))
                 Nm_ant = Nm
         errkv.append(errkv_e)

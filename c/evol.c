@@ -71,42 +71,41 @@ void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad *
   pasBA(z, e, params, np, h, x_adj, y_adj, sp, pA, pB);
 }
 
-void evolABAsolar_errH(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH) {
+void evolABAsolar_errH(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH) {
   int tam = np*3*2;
   quad zq[tam], paramsq[np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
   quad err;
 
   hq = real2quad(h);
-  real2quadV(zq, z, tam);
-  real2quadV(paramsq, params, np);
-  real2quadV(aq, a, s + 1);
-  real2quadV(bq, b, s);
-  real2quadV(xq, x, sp);
-  real2quadV(yq, y, sp);
-  
+  str2quadV(zq, z, tam);
+  str2quadV(paramsq, params, np);
+  str2quadV(aq, a, s + 1);
+  str2quadV(bq, b, s);
+  str2quadV(xq, x, sp);
+  str2quadV(yq, y, sp);  
   evolABAsc(zq, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err);
   *lerH = quad2real(log10q(err));
-  
-  quad2realV(z, zq, tam);
+
+  /* quad2strV(z, zq, tam); */
 }
 
-void evolABAsolar_errQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerQ) {
+void evolABAsolar_errQ(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerQ) {  
   real meh;
   evolABAsolar_errHQ(z, params, np, Nm, h, a, b, s, x, y, sp, &meh, lerQ);
 }
 
-void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH, real * lerQ) {
+void evolABAsolar_errHQ(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH, real * lerQ) {
   int tam = np*3*2;
   quad meh, meq, zt[tam];
   quad zq[tam], paramsq[np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
   
   hq = real2quad(h);
-  real2quadV(zq, z, tam);
-  real2quadV(paramsq, params, np);
-  real2quadV(aq, a, s + 1);
-  real2quadV(bq, b, s);
-  real2quadV(xq, x, sp);
-  real2quadV(yq, y, sp);
+  str2quadV(zq, z, tam);
+  str2quadV(paramsq, params, np);
+  str2quadV(aq, a, s + 1);
+  str2quadV(bq, b, s);
+  str2quadV(xq, x, sp);
+  str2quadV(yq, y, sp);
   
   copy(zt, zq, tam);
   evolABAsc(zq, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh);
@@ -115,5 +114,5 @@ void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * 
   meq = difnorm2(zq, zt, tam/2);
   *lerQ = quad2real(log10q(meq));
   
-  quad2realV(z, zq, tam);
+  /* quad2strV(z, zq, tam); */
 }

@@ -33,7 +33,7 @@ void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 /*   maxerH: màxim error de la quatitat conservada */
 /* Queda pendent escriure en fitxers per veure l'evolució de les z */
 void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH);
-void evolABAsolar_errH(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH);
-void evolABAsolar_errQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH);
-void evolABAsolar_errHQ(real * z, real * params, int np, int Nm, real h, real * a, real * b, int s, real * x, real * y, int sp, real * lerH, real * lerQ);
+void evolABAsolar_errH(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH);
+void evolABAsolar_errQ(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerQ);
+void evolABAsolar_errHQ(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH, real * lerQ);
 #endif
