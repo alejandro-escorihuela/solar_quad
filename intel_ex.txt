@@ -1,0 +1,2 @@
+Before run python main.py you must run this (if you used icc compiler):
+export LD_LIBRARY_PATH="/opt/intel/oneapi/compiler/latest/lib:/usr/local/lib"

@@ -21,8 +21,8 @@ from evol import *
 if __name__ == "__main__":
     titols = "Sistema Solar BC"
     T = 1e4
-    N = (10**np.linspace(2.0, 6.0, 25)).astype(int)
-    # N = (10**np.linspace(0.1, 4.5, 25)).astype(int)
+    # N = (10**np.linspace(2.0, 6.0, 25)).astype(int)
+    N = (10**np.linspace(0.1, 4.5, 15)).astype(int)
     zini = iniSS()    
         
     errkv, navav = [], []
@@ -57,5 +57,6 @@ if __name__ == "__main__":
         plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10) + "--", marker = "o", markersize=7.5, linewidth=1.5, label = noms[i % len(noms)])
     plt.title(titols)
     plt.legend()
+    plt.savefig("out.pdf", format='pdf')
     plt.show()
 

@@ -46,7 +46,7 @@ void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 }
 
 void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH) {
-  int i, Nf, tam = np*3*2;
+  int i, Nf, Nmod, tam = np*3*2, punts = 100;
   quad H0, HF, erH;
   quad e[tam], ec[tam], zc[tam], x_adj[tam], y_adj[tam];
   
@@ -58,15 +58,18 @@ void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad *
   H0 = hH(z, params, np);
   pasAB(z, e, params, np, h, x, y, sp, pA, pB);
   Nf = Nm - 2*abs((int) round(suma(x, sp)));
+  Nmod = Nf > punts ? Nf/punts : 1;
   for (i = 0; i < Nf; i++) {
     pasABA(z, e, params, np, h, a, b, s, pA, pB);
-    copy(zc, z, tam);
-    copy(ec, e, tam);
-    pasBA(zc, ec, params, np, h, x_adj, y_adj, sp, pA, pB);
-    HF = hH(zc, params, np);
-    erH = fabsq((HF - H0)/H0);
-    if (erH > *maxerH)
-       *maxerH = erH;
+    if (i % Nmod == 0) {
+      copy(zc, z, tam);
+      copy(ec, e, tam);
+      pasBA(zc, ec, params, np, h, x_adj, y_adj, sp, pA, pB);
+      HF = hH(zc, params, np);
+      erH = fabsq((HF - H0)/H0);
+      if (erH > *maxerH)
+	*maxerH = erH;
+    }
   }
   pasBA(z, e, params, np, h, x_adj, y_adj, sp, pA, pB);
 }

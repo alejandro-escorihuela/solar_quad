@@ -7,9 +7,9 @@ ICC = /opt/intel/oneapi/compiler/2024.0/bin/icx  # Compilador C intel
 # $ export LD_LIBRARY_PATH="/opt/intel/oneapi/compiler/latest/lib:/usr/local/lib"
 GCC = gcc # Compilador C gnu
 COM = $(GCC)
-LIB = -lm -lquadmath # Llibreries (-l*, -L*, -I*)
+LIB = -I/usr/lib/gcc/x86_64-linux-gnu/12/include/ -lm -lquadmath # Llibreries (-l*, -L*, -I*)
 AVS = -W -Wall -Wextra -pedantic # -ansi no funciona amb -lquadmath
-OPT = -march=native -O2 --fast-math -pipe -std=c17 -shared -fPIC # Optimitzacio
+OPT = -march=native -O2 -ffast-math -pipe -std=c17 -shared -fPIC # Optimitzacio
 OPC = $(OPT) $(AVS) # Opcions
 
 all: $(OBJ)
