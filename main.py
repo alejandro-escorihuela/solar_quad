@@ -24,7 +24,8 @@ if __name__ == "__main__":
     # N = (10**np.linspace(2.0, 6.0, 25)).astype(int)
     N = (10**np.linspace(0.1, 4.5, 15)).astype(int)
     zini = iniSS()    
-        
+    params = expand_masses(ss_ma)
+    
     errkv, navav = [], []
     ri = 0
     n_m = len(cofABA)
@@ -39,8 +40,8 @@ if __name__ == "__main__":
             Nm = int(np.ceil(n/s))
             if Nm > Nm_ant:               
                 h = T/Nm
-                # lerH, lerQ = evolABA_errHQ(zini.copy(), Nm, h, a, b, x, y)
-                lerH, lerQ = evolABA_errH(zini.copy(), Nm, h, a, b, x, y), np.nan
+                # lerH, lerQ = evolABA_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
+                lerH, lerQ = evolABA_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
                 errkv_e.append(lerH)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)

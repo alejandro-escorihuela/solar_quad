@@ -20,4 +20,5 @@ void phiscHK(quad * z, quad * dz, quad * mas, quad h, int np);
 void phiscHI(quad * z, quad * dz, quad * mas, quad h, int np);
 quad ham(quad * z, quad * mas, int np);
 
+//void cart2jacobi(quad * z, quad * zb, )
 #endif

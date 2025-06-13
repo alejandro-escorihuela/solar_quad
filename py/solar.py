@@ -11,10 +11,10 @@ ss_ma = np.array([1.0,
                   1.660130719E-07, 2.447712418E-06, 3.002609351E-06, 3.226998492E-07,
                   9.543137255E-04, 2.857310206E-04,
                   4.364519859E-05, 5.148818502E-05, 6.571141277E-09]).astype("float128")
-ss_ma = list(map(str, ss_ma))
+#ss_ma = list(map(str, ss_ma))
 
 # Nombre de planetes sistema solar
-ss_np = 10
+ss_np = len(ss_ma)
 
 def iniSS():
     q, p = np.zeros((ss_np, 3)), np.zeros((ss_np, 3))
@@ -102,3 +102,19 @@ def iniSS():
     z = list(map(str, z))
     return z
 
+def expand_masses(vec):
+    np = len(vec)
+    m, M, mb, nu, muG = list(vec), [0.0]*np, [0.0]*np, [0.0]*np, [0.0]*np
+    for i in range(np):
+        Mi = 0.0
+        for j in range(i + 1):
+            Mi += m[j]
+        M[i] = Mi
+    mb[0] = M[np - 1]
+    nu[0] = m[0]/M[0]
+    muG[0] = 0.0 # no té validesa física
+    for i in range(1, np):
+        mb[i] = M[i - 1]*m[i]/M[i]
+        nu[i] = m[i]/M[i]
+        muG[i] = m[0]*m[i]/mb[i]
+    return list(map(str, m + M + mb + nu + muG))
