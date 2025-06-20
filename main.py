@@ -19,13 +19,14 @@ from evol import *
 #plt.rcParams['figure.dpi'] = 288
 
 if __name__ == "__main__":
-    titols = "Sistema Solar BC"
+    titols = "Sistema Solar"
     T = 1e4
     # N = (10**np.linspace(2.0, 6.0, 25)).astype(int)
     N = (10**np.linspace(0.1, 4.5, 15)).astype(int)
-    zini = iniSS()    
-    params = expand_masses(ss_ma)
-    
+    quins = [1, 0, 0, 0, 0, 1]
+    quins = [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+    zini, params = iniSS(quins)
+
     errkv, navav = [], []
     ri = 0
     n_m = len(cofABA)

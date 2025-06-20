@@ -14,11 +14,11 @@
 #define IND_Q(I, J, NP) (3*I + J)
 #define IND_P(I, J, NP) (3*(I + NP) + J)
 
-quad grad(quad * z, quad * mas, int i, int j, int np);
-void kepler_sc(quad * z, quad * dz, quad * mas, int i, quad h, int np);
-void phiscHK(quad * z, quad * dz, quad * mas, quad h, int np);
-void phiscHI(quad * z, quad * dz, quad * mas, quad h, int np);
-quad ham(quad * z, quad * mas, int np);
+void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np);
+void phiscHK(quad * z, quad * dz, quad * par, quad h, int np);
+void phiscHI(quad * z, quad * dz, quad * par, quad h, int np);
+quad ham(quad * z, quad * par, int np);
 
-//void cart2jacobi(quad * z, quad * zb, )
+void cart2jacobi(quad * z, quad * zb, quad * par, int np);
+void jacobi2cart(quad * z, quad * zb, quad * par, int np);
 #endif

@@ -5,30 +5,10 @@
 #include <stdlib.h>
 #include "solar.h"
 
-quad grad(quad * z, quad * mas, int i, int j, int np) {;
-  int k, m;
-  quad gV = 0.0, q[np][3], resta[3], den;
-  
-  if (i == 0)
-    return 0.0;
-  for (k = 0; k < np; k++)
-    for (m = 0; m < 3; m++)
-      q[k][m] = z[IND_Q(k, m, np)];
-  for (k = 1; k < np; k++)
-    if (i != k) {
-      for (m = 0; m < 3; m++)
-	resta[m] = q[i][m] - q[k][m];
-      den = powq((resta[0]*resta[0]) + (resta[1]*resta[1]) + (resta[2]*resta[2]), 1.5);
-      gV += (mas[k]*(q[i][j] - q[k][j]))/den;
-    }
-  gV *= GRAV_CNT*mas[i];
-  return gV;  
-}
-
-void kepler_sc(quad * z, quad * dz, quad * mas, int i, quad h, int np) {
+void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
   /* Sergio Blanes and Fernando Casas: A Concise Introduction to Geometric Numerical Integrator p[28,29] */
   /* Adapted to compensated summation by Ander Murua */
-  quad q[3], p[3], q_ant[3], p_ant[3];
+  quad q[3], v[3], q_ant[3], v_ant[3];
   quad t, mu, r0, v02, u, a;
   quad c, s, s2, sig, psi, w, x, dx, adx, adx_ant;
   quad fft, gg, fp, gpt, aux;
@@ -37,14 +17,14 @@ void kepler_sc(quad * z, quad * dz, quad * mas, int i, quad h, int np) {
   if (i > 0) {
     for (j = 0; j < 3; j++) {
       q[j] = q_ant[j] = z[IND_Q(i, j, np)];
-      p[j] = p_ant[j] = z[IND_P(i, j, np)];
+      v[j] = v_ant[j] = z[IND_P(i, j, np)];
 
     }
-    t = h/mas[i];
-    mu = GRAV_CNT*mas[0]*mas[i]*mas[i];
+    t = h;
+    mu = par[4*np + i];
     r0 = sqrtq(dot(q, q));
-    v02 = dot(p, p);
-    u = dot(q, p);
+    v02 = dot(v, v);
+    u = dot(q, v);
     a = -mu/(v02 - ((2.0*mu)/r0));
     w = sqrtq(mu/(a*a*a));
     sig = 1.0 - r0/a;
@@ -67,47 +47,180 @@ void kepler_sc(quad * z, quad * dz, quad * mas, int i, quad h, int np) {
     fp = (-a*w*s)/(aux*r0);
     gpt = -s2/aux;
     for (j = 0; j < 3; j++) {
-      dz[IND_Q(i, j, np)] = fft*q_ant[j] + gg*p_ant[j];
-      dz[IND_P(i, j, np)] = fp*q_ant[j] + gpt*p_ant[j];
+      dz[IND_Q(i, j, np)] = fft*q_ant[j] + gg*v_ant[j];
+      dz[IND_P(i, j, np)] = fp*q_ant[j] + gpt*v_ant[j];
     }
   }
 }
 
-void phiscHK(quad * z, quad * dz, quad * mas, quad h, int np) {
+void phiscHK(quad * z, quad * dz, quad * par, quad h, int np) {
   int i;
   
-  for (i = 0; i < np; i++)
-    kepler_sc(z, dz, mas, i, h, np);
+  for (i = 1; i < np; i++)
+    kepler_sc(z, dz, par, i, h, np);
 }
 
-void phiscHI(quad * z, quad * dz, quad * mas, quad h, int np) {
-  int i, j;
-  
-  for (i = 0; i < np; i++)
-    for (j = 0; j < 3; j++) {
-      dz[IND_Q(i, j, np)] = 0.0;
-      dz[IND_P(i, j, np)] = -h*grad(z, mas, i, j, np);
-    } 
-}
-
-quad ham(quad * z, quad * mas, int np) {
+void phiscHI(quad * z, quad * dz, quad * par, quad h, int np) {
   int i, j, k;
-  quad cin = 0.0, pot = 0.0, q[np][3], p[np][3], resta[3];
+  quad m[np], nu[np], mu[np];  
+  quad q[np][3], qb[np][3], Q[np][3], qpp[np][3], qbpp[np][3];
+  quad resta[3], mod, den;
+  
+  /* par -> m, nu */
+  for (i = 0; i < np; i++) {
+    m[i] = par[i];
+    nu[i] = par[3*np + i];
+    mu[i] = par[4*np + i];
+  }
+  
+  /* qb -> q */
+  for (j = 0; j < 3; j++)
+    Q[np - 1][j] = z[IND_Q(0, j, np)];
+  for (i = np - 1; i > 0; i--)
+    for (j = 0; j < 3; j++) {
+      Q[i - 1][j] = Q[i][j] - nu[i]*z[IND_Q(i, j, np)];
+      q[i][j] = z[IND_Q(i, j, np)] + Q[i - 1][j];   
+    }
+  for (j = 0; j < 3; j++)
+    q[0][j] = Q[0][j];
+  /* qpp */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++)
+      qpp[i][j] = 0.0;
+  for (i = 0; i < np; i++)
+    for (k = 0; k < np; k++)
+      if (i != k) {
+	for (j = 0; j < 3; j++)
+	  resta[j] = q[i][j] - q[k][j];
+	den = 1.0/powq((resta[0]*resta[0]) + (resta[1]*resta[1]) + (resta[2]*resta[2]), 1.5);
+	for (j = 0; j < 3; j++)
+	  qpp[i][j] -= par[k]*resta[j]*den;
+      }
+  /* qpp -> qbpp */
+  for (j = 0; j < 3; j++)
+    Q[0][j] = qpp[0][j];
+  for (i = 1; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      qbpp[i][j] = qpp[i][j] - Q[i - 1][j];
+      Q[i][j] = Q[i - 1][j] + nu[i]*qbpp[i][j];  
+    }
+  for (j = 0; j < 3; j++)
+    qbpp[0][j] = Q[np - 1][j];
+  /* dvb */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++)
+      dz[IND_Q(i, j, np)] = dz[IND_P(i, j, np)] = 0.0;
+  for (i = 1; i < np; i++) {
+    mod = 1.0/powq(z[IND_Q(i, 0, np)]*z[IND_Q(i, 0, np)] + z[IND_Q(i, 1, np)]*z[IND_Q(i, 1, np)] + z[IND_Q(i, 2, np)]*z[IND_Q(i, 2, np)], 1.5);
+    for (j = 0; j < 3; j++)
+      dz[IND_P(i, j, np)] = h*(mu[i]*z[IND_Q(i, j, np)]*mod + qbpp[i][j]);
+  }
+}
+
+quad ham(quad * z, quad * par, int np) {
+  int i, j, k;
+  quad cin = 0.0, pot = 0.0, q[np][3], v[np][3], resta[3];
   
   for (i = 0; i < np; i++)
     for (j = 0; j < 3; j++) {
       q[i][j] = z[IND_Q(i, j, np)];
-      p[i][j] = z[IND_P(i, j, np)];
+      v[i][j] = z[IND_P(i, j, np)];
     }
   for (i = 0; i < np; i++)
-    cin += (p[i][0]*p[i][0] + p[i][1]*p[i][1] + p[i][2]*p[i][2])/mas[i];
+    cin += par[i]*(v[i][0]*v[i][0] + v[i][1]*v[i][1] + v[i][2]*v[i][2]);
   cin *= 0.5;
-  for (i = 0; i < np; i++)
+  for (i = 1; i < np; i++)
     for (j = 0; j < i; j++) {
       for (k = 0; k < 3; k++)
 	resta[k] = q[i][k] - q[j][k];
-      pot += mas[i]*mas[j]/sqrtq(resta[0]*resta[0] + resta[1]*resta[1] + resta[2]*resta[2]);
+      pot += par[i]*par[j]/sqrtq(resta[0]*resta[0] + resta[1]*resta[1] + resta[2]*resta[2]);
     }
-  pot *= -GRAV_CNT;
-  return cin + pot;
+  return cin - pot;
+}
+
+void cart2jacobi(quad * z, quad * zb, quad * par, int np) {
+  int i, j;
+  quad m[np], nu[np];
+  quad q[np][3], qb[np][3], Q[np][3];
+  quad v[np][3], vb[np][3], V[np][3];
+  
+  /* par -> m, nu */
+  for (i = 0; i < np; i++) {
+    m[i] = par[i];
+    nu[i] = par[3*np + i];    
+  }
+
+  /* z -> q, v */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      q[i][j] = z[IND_Q(i, j, np)];
+      v[i][j] = z[IND_P(i, j, np)];
+    } 
+  /* q, v -> qb, vb */
+  for (j = 0; j < 3; j++) {
+    Q[0][j] = q[0][j];
+    V[0][j] = v[0][j];
+  }
+  for (i = 1; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      qb[i][j] = q[i][j] - Q[i - 1][j];
+      Q[i][j] = Q[i - 1][j] + nu[i]*qb[i][j];
+      vb[i][j] = v[i][j] - V[i - 1][j]; 
+      V[i][j] = V[i - 1][j] + nu[i]*vb[i][j];      
+    }
+  for (j = 0; j < 3; j++) {
+    qb[0][j] = Q[np - 1][j];
+    vb[0][j] = V[np - 1][j];      
+  }
+
+  /* qb, vb -> zb */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      zb[IND_Q(i, j, np)] = qb[i][j];
+      zb[IND_P(i, j, np)] = vb[i][j];
+    }
+}
+
+void jacobi2cart(quad * z, quad * zb, quad * par, int np) {
+  int i, j;
+  quad m[np], nu[np];
+  quad q[np][3], qb[np][3], Q[np][3];
+  quad v[np][3], vb[np][3], V[np][3];
+  
+  /* par -> m, nu */
+  for (i = 0; i < np; i++) {
+    m[i] = par[i];
+    nu[i] = par[3*np + i];    
+  }
+
+  /* zb -> qb, vb */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      qb[i][j] = zb[IND_Q(i, j, np)];
+      vb[i][j] = zb[IND_P(i, j, np)];
+    } 
+  
+  /* qb, vb -> q, v */
+  for (j = 0; j < 3; j++) {
+    Q[np - 1][j] = qb[0][j];
+    V[np - 1][j] = vb[0][j];
+  }
+  for (i = np - 1; i > 0; i--)
+    for (j = 0; j < 3; j++) {
+      Q[i - 1][j] = Q[i][j] - nu[i]*qb[i][j];
+      q[i][j] = qb[i][j] + Q[i - 1][j];
+      V[i - 1][j] = V[i][j] - nu[i]*vb[i][j];
+      v[i][j] = vb[i][j] + V[i - 1][j];      
+    }
+  for (j = 0; j < 3; j++) {
+    q[0][j] = Q[0][j];
+    v[0][j] = V[0][j];
+  }
+
+  /* q, v -> z */
+  for (i = 0; i < np; i++)
+    for (j = 0; j < 3; j++) {
+      z[IND_Q(i, j, np)] = q[i][j];
+      z[IND_P(i, j, np)] = v[i][j];
+    }  
 }

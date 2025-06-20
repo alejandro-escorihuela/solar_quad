@@ -295,8 +295,8 @@ cofABA, proABA = [], []
 # proABA.append([])
 # cofABA.append(estendreA(NIA7_864))
 # proABA.append([])
-# cofABA.append(estendreA(NIA8_1064))
-# proABA.append([]) 
+cofABA.append(estendreA(NIA8_1064))
+proABA.append([]) 
 # cofABA.append(estendreA(NIA8_1064))
 # proABA.append(PNIA14)
 # cofABA.append(estendreA(NIA884))
@@ -311,14 +311,14 @@ cofABA, proABA = [], []
 # proABA.append([])
 # cofABA.append(estendreA(RNIA1486))
 # proABA.append([])
-# cofABA.append(estendreA(NIA3_x64))
-# proABA.append(TNIA8_3x64A)
+cofABA.append(estendreA(NIA3_x64))
+proABA.append(TNIA8_3x64A)
 # cofABA.append(estendreA(NIA3_x64))
 # proABA.append(TNIA8_3x64B)
-# cofABA.append(estendreA(NIA3_x64))
-# proABA.append(TNIA10_3x64)
-# cofABA.append(estendreA(NIA5_x64))
-# proABA.append(TNIA8_5x64)
+cofABA.append(estendreA(NIA3_x64))
+proABA.append(TNIA10_3x64)
+cofABA.append(estendreA(NIA5_x64))
+proABA.append(TNIA8_5x64)
 cofABA.append(estendreA(NIA5_x64))
 proABA.append(TNIA10_5x64)
 # cofABA.append(estendreA(NIA7_x864))
@@ -331,5 +331,5 @@ proABA.append(TNIA10_5x64)
 # proABA.append([])   
 
 
-# noms = ["NIA8_1064", "TNIA3_864", "TNIA3_1064", "TNIA5_864", "TNIA5_1064", "TNIA7_8864", "TNIA7_10864"]
-noms = ["TNIA5_1064"]
+noms = ["NIA8_1064", "TNIA3_864", "TNIA3_1064", "TNIA5_864", "TNIA5_1064"]#, "TNIA7_8864", "TNIA7_10864"]
+
