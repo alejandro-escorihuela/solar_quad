@@ -22,8 +22,8 @@ evol.evolABAsolar_errHQ.restype = ct.c_void_p
 
 def evolABA_errH(z, par, Nm, h, a, b, x, y):
     global evol
-    np = len(par)//5
-    par_c = (ct.c_char_p*len(par))()
+    np = len(par)
+    par_c = (ct.c_char_p*np)()
     z_c = (ct.c_char_p*len(z))()
     a_c = (ct.c_char_p*len(a))()
     b_c = (ct.c_char_p*len(b))()
@@ -42,8 +42,8 @@ def evolABA_errH(z, par, Nm, h, a, b, x, y):
 
 def evolABA_errQ(z, par, Nm, h, a, b, x, y):
     global evol
-    np = len(par)//5
-    par_c = (ct.c_char_p*len(par))()
+    np = len(par)
+    par_c = (ct.c_char_p*np)()
     z_c = (ct.c_char_p*len(z))()
     a_c = (ct.c_char_p*len(a))()
     b_c = (ct.c_char_p*len(b))()
@@ -61,8 +61,8 @@ def evolABA_errQ(z, par, Nm, h, a, b, x, y):
 
 def evolABA_errHQ(z, par, Nm, h, a, b, x, y):
     global evol
-    np = len(par)//5
-    par_c = (ct.c_char_p*len(par))()
+    np = len(par)
+    par_c = (ct.c_char_p*np)()
     z_c = (ct.c_char_p*len(z))()
     a_c = (ct.c_char_p*len(a))()
     b_c = (ct.c_char_p*len(b))()

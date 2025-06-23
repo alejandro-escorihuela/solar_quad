@@ -21,7 +21,7 @@ void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
 
     }
     t = h;
-    mu = par[4*np + i];
+    mu = par[np + i];
     r0 = sqrtq(dot(q, q));
     v02 = dot(v, v);
     u = dot(q, v);
@@ -62,15 +62,14 @@ void phiscHK(quad * z, quad * dz, quad * par, quad h, int np) {
 
 void phiscHI(quad * z, quad * dz, quad * par, quad h, int np) {
   int i, j, k;
-  quad m[np], nu[np], mu[np];  
-  quad q[np][3], qb[np][3], Q[np][3], qpp[np][3], qbpp[np][3];
+  quad nu[np], mu[np];  
+  quad q[np][3], Q[np][3], qpp[np][3], qbpp[np][3];
   quad resta[3], mod, den;
   
   /* par -> m, nu */
   for (i = 0; i < np; i++) {
-    m[i] = par[i];
-    nu[i] = par[3*np + i];
-    mu[i] = par[4*np + i];
+    mu[i] = par[np + i];
+    nu[i] = par[2*np + i];
   }
   
   /* qb -> q */
@@ -119,12 +118,13 @@ void phiscHI(quad * z, quad * dz, quad * par, quad h, int np) {
 
 quad ham(quad * z, quad * par, int np) {
   int i, j, k;
-  quad cin = 0.0, pot = 0.0, q[np][3], v[np][3], resta[3];
+  quad zcart[3*np*2], cin = 0.0, pot = 0.0, q[np][3], v[np][3], resta[3];
   
+  jacobi2cart(zcart, z, par, np);
   for (i = 0; i < np; i++)
     for (j = 0; j < 3; j++) {
-      q[i][j] = z[IND_Q(i, j, np)];
-      v[i][j] = z[IND_P(i, j, np)];
+      q[i][j] = zcart[IND_Q(i, j, np)];
+      v[i][j] = zcart[IND_P(i, j, np)];
     }
   for (i = 0; i < np; i++)
     cin += par[i]*(v[i][0]*v[i][0] + v[i][1]*v[i][1] + v[i][2]*v[i][2]);
@@ -138,34 +138,68 @@ quad ham(quad * z, quad * par, int np) {
   return cin - pot;
 }
 
-void cart2jacobi(quad * z, quad * zb, quad * par, int np) {
-  int i, j;
-  quad m[np], nu[np];
-  quad q[np][3], qb[np][3], Q[np][3];
-  quad v[np][3], vb[np][3], V[np][3];
+void expand_masses(quad * par, quad * Gm, int np) {
+  int i;
+  quad GM[np], nu[np], mu[np];
   
-  /* par -> m, nu */
-  for (i = 0; i < np; i++) {
-    m[i] = par[i];
-    nu[i] = par[3*np + i];    
+  GM[0] = Gm[0];
+  for (i = 1; i < np; i++)
+    GM[i] = GM[i - 1] + Gm[i];
+  nu[0] = Gm[0]/GM[0];
+  mu[0] = 0.0;
+  for (i = 1; i < np; i++) {
+    mu[i] = Gm[0]*GM[i]/GM[i - 1];
+    nu[i] = Gm[i]/GM[i];
   }
+  for (i = 0; i < np; i++) {
+    par[i] = Gm[i];
+    par[np + i] = mu[i];
+    par[2*np + i] = nu[i];
+  }
+}
 
-  /* z -> q, v */
+void centrar(quad * z, quad * par, int np) {
+  int i, j;
+  quad M = 0, qcm[3] = {0, 0, 0}, vcm[3] = {0, 0, 0};
+
+  for (i = 0; i < np; i++) {
+    M += par[i];
+    for (j = 0; j < 3; j++) {
+      qcm[j] += par[i]*z[IND_Q(i, j, np)];
+      vcm[j] += par[i]*z[IND_P(i, j, np)];
+    }
+  }
+  for (j = 0; j < 3; j++) {
+    qcm[j] /= M;
+    vcm[j] /= M;
+  }
   for (i = 0; i < np; i++)
     for (j = 0; j < 3; j++) {
-      q[i][j] = z[IND_Q(i, j, np)];
-      v[i][j] = z[IND_P(i, j, np)];
-    } 
+      z[IND_Q(i, j, np)] -= qcm[j];
+      z[IND_P(i, j, np)] -= vcm[j];
+    }  
+}
+
+void cart2jacobi(quad * zb, quad * z, quad * par, int np) {
+  int i, j;
+  quad nu[np];
+  quad qb[np][3], Q[np][3];
+  quad vb[np][3], V[np][3];
+  
+  /* par -> m, nu */
+  for (i = 0; i < np; i++)
+    nu[i] = par[2*np + i];    
+
   /* q, v -> qb, vb */
   for (j = 0; j < 3; j++) {
-    Q[0][j] = q[0][j];
-    V[0][j] = v[0][j];
+    Q[0][j] = z[IND_Q(0, j, np)];
+    V[0][j] = z[IND_P(0, j, np)];
   }
   for (i = 1; i < np; i++)
     for (j = 0; j < 3; j++) {
-      qb[i][j] = q[i][j] - Q[i - 1][j];
+      qb[i][j] = z[IND_Q(i, j, np)] - Q[i - 1][j];
       Q[i][j] = Q[i - 1][j] + nu[i]*qb[i][j];
-      vb[i][j] = v[i][j] - V[i - 1][j]; 
+      vb[i][j] = z[IND_P(i, j, np)] - V[i - 1][j]; 
       V[i][j] = V[i - 1][j] + nu[i]*vb[i][j];      
     }
   for (j = 0; j < 3; j++) {
@@ -183,34 +217,25 @@ void cart2jacobi(quad * z, quad * zb, quad * par, int np) {
 
 void jacobi2cart(quad * z, quad * zb, quad * par, int np) {
   int i, j;
-  quad m[np], nu[np];
-  quad q[np][3], qb[np][3], Q[np][3];
-  quad v[np][3], vb[np][3], V[np][3];
+  quad nu[np];
+  quad q[np][3], Q[np][3];
+  quad v[np][3], V[np][3];
   
   /* par -> m, nu */
-  for (i = 0; i < np; i++) {
-    m[i] = par[i];
-    nu[i] = par[3*np + i];    
-  }
-
-  /* zb -> qb, vb */
   for (i = 0; i < np; i++)
-    for (j = 0; j < 3; j++) {
-      qb[i][j] = zb[IND_Q(i, j, np)];
-      vb[i][j] = zb[IND_P(i, j, np)];
-    } 
+    nu[i] = par[2*np + i];    
   
   /* qb, vb -> q, v */
   for (j = 0; j < 3; j++) {
-    Q[np - 1][j] = qb[0][j];
-    V[np - 1][j] = vb[0][j];
+    Q[np - 1][j] = zb[IND_Q(0, j, np)];
+    V[np - 1][j] = zb[IND_P(0, j, np)];
   }
   for (i = np - 1; i > 0; i--)
     for (j = 0; j < 3; j++) {
-      Q[i - 1][j] = Q[i][j] - nu[i]*qb[i][j];
-      q[i][j] = qb[i][j] + Q[i - 1][j];
-      V[i - 1][j] = V[i][j] - nu[i]*vb[i][j];
-      v[i][j] = vb[i][j] + V[i - 1][j];      
+      Q[i - 1][j] = Q[i][j] - nu[i]*zb[IND_Q(i, j, np)];
+      q[i][j] = zb[IND_Q(i, j, np)] + Q[i - 1][j];
+      V[i - 1][j] = V[i][j] - nu[i]*zb[IND_P(i, j, np)];
+      v[i][j] = zb[IND_P(i, j, np)] + V[i - 1][j]; 
     }
   for (j = 0; j < 3; j++) {
     q[0][j] = Q[0][j];
@@ -222,5 +247,5 @@ void jacobi2cart(quad * z, quad * zb, quad * par, int np) {
     for (j = 0; j < 3; j++) {
       z[IND_Q(i, j, np)] = q[i][j];
       z[IND_P(i, j, np)] = v[i][j];
-    }  
+    }
 }

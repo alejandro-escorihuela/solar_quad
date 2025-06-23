@@ -19,7 +19,7 @@ void pasAB(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
 
 /* Input/Output: */
-/*   z: coordenades q i p */
+/*   z: coordenades q i v */
 /* Input: */
 /*   params: parametres quads, en el cas solar les masses */
 /*   np: dimensió de params, en el cas solar nombre de planetes */

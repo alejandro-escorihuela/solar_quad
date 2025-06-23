@@ -20,13 +20,13 @@ from evol import *
 
 if __name__ == "__main__":
     titols = "Sistema Solar"
-    T = 1e4
-    # N = (10**np.linspace(2.0, 6.0, 25)).astype(int)
-    N = (10**np.linspace(0.1, 4.5, 15)).astype(int)
-    quins = [1, 0, 0, 0, 0, 0, 1]
-    quins = [1, 0, 0, 0, 0, 0, 1, 1]
-    #quins = [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
-    #quins = [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]
+    # T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
+    T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
+    # T, N = 2e5, (10**np.linspace(0.1, 6.5, 25)).astype(int)
+    # quins = [1, 0, 0, 0, 0, 0, 1]
+    # quins = [1, 0, 0, 0, 0, 0, 1, 1]
+    quins = [1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+    # quins = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     zini, params, planetes = iniSS(quins)
     print("Sistema Solar: " + ", ".join(planetes))
 

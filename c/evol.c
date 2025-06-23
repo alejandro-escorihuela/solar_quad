@@ -48,7 +48,7 @@ void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH) {
   int i, Nf, Nmod, tam = np*3*2, punts = 100;
   quad H0, HF, erH;
-  quad e[tam], ec[tam], zb[tam], zc[tam], zp[tam], x_adj[tam], y_adj[tam];
+  quad e[tam], ec[tam], zc[tam], x_adj[tam], y_adj[tam];
   
   *maxerH = 0.0;
   zeros(e, tam);
@@ -56,40 +56,42 @@ void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad *
   adjunt(y_adj, y, sp);
 
   H0 = hH(z, params, np);
-  cart2jacobi(z, zb, params, np);
-  pasAB(zb, e, params, np, h, x, y, sp, pA, pB);
+  pasAB(z, e, params, np, h, x, y, sp, pA, pB);
   Nf = Nm - 2*abs((int) round(suma(x, sp)));
   Nmod = Nf > punts ? Nf/punts : 1;
   for (i = 0; i < Nf; i++) {
-    pasABA(zb, e, params, np, h, a, b, s, pA, pB);
+    pasABA(z, e, params, np, h, a, b, s, pA, pB);
     if (i % Nmod == 0) {
-      copy(zc, zb, tam);
+      copy(zc, z, tam);
       copy(ec, e, tam);
       pasBA(zc, ec, params, np, h, x_adj, y_adj, sp, pA, pB);
-      jacobi2cart(zp, zc, params, np);
-      HF = hH(zp, params, np);
+      HF = hH(zc, params, np);
       erH = fabsq((HF - H0)/H0);
       if (erH > *maxerH)
 	*maxerH = erH;
     }
   }
-  pasBA(zb, e, params, np, h, x_adj, y_adj, sp, pA, pB);
-  jacobi2cart(z, zb, params, np);
+  pasBA(z, e, params, np, h, x_adj, y_adj, sp, pA, pB);
 }
 
 void evolABAsolar_errH(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH) {
   int tam = np*3*2;
-  quad zq[tam], paramsq[5*np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
+  quad zq[tam], zbq[tam], paramsq[np], masq[3*np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
   quad err;
 
   hq = real2quad(h);
   str2quadV(zq, z, tam);
-  str2quadV(paramsq, params, 5*np);
+  str2quadV(paramsq, params, np);
   str2quadV(aq, a, s + 1);
   str2quadV(bq, b, s);
   str2quadV(xq, x, sp);
   str2quadV(yq, y, sp);
-  evolABAsc(zq, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err);
+
+  expand_masses(masq, paramsq, np);
+  centrar(zq, masq, np);
+  cart2jacobi(zbq, zq, masq, np);
+  evolABAsc(zbq, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err);
+  jacobi2cart(zq, zbq, masq, np);
   *lerH = quad2real(log10q(err));
 
   /* quad2strV(z, zq, tam); */
@@ -102,21 +104,26 @@ void evolABAsolar_errQ(const char ** z, const char ** params, int np, int Nm, re
 
 void evolABAsolar_errHQ(const char ** z, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH, real * lerQ) {
   int tam = np*3*2;
-  quad meh, meq, zt[tam];
-  quad zq[tam], paramsq[5*np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
+  quad meh, meq;
+  quad zq[tam], zt[tam], zbq[tam], zbt[tam], paramsq[np], masq[3*np], hq, aq[s + 1], bq[s], xq[sp], yq[sp];
   
   hq = real2quad(h);
   str2quadV(zq, z, tam);
-  str2quadV(paramsq, params, 5*np);
+  str2quadV(paramsq, params, np);
   str2quadV(aq, a, s + 1);
   str2quadV(bq, b, s);
   str2quadV(xq, x, sp);
   str2quadV(yq, y, sp);
-  
-  copy(zt, zq, tam);
-  evolABAsc(zq, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh);
+
+  expand_masses(masq, paramsq, np);
+  centrar(zq, masq, np);
+  cart2jacobi(zbq, zq, masq, np);
+  copy(zbt, zbq, tam);
+  evolABAsc(zbq, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh);
   *lerH = quad2real(log10q(meh));
-  evolABAsc(zt, paramsq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh);
+  evolABAsc(zbt, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh);
+  jacobi2cart(zq, zbq, masq, np);
+  jacobi2cart(zt, zbt, masq, np);
   meq = difnorm2(zq, zt, tam/2);
   *lerQ = quad2real(log10q(meq));
   

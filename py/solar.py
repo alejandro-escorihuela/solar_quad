@@ -14,8 +14,6 @@ def iniSS(quins):
     ##   quins = [1, 1, 1, 1, 1]
     ## Mercuri - Plutó (tam = 10)
     ##   quins = [1]*10
-    ## Mercuri - Plutó + satèl·lits + planetes nans (tam = 18)
-    ##   quins = [1]*18
     
     ## dades a 28/06/1969 00:00
     m, q, v, noms = llegirfit("./ini/horizons1969.txt")
@@ -35,7 +33,7 @@ def iniSS(quins):
             j += 1
     z = np.concatenate((q_sel.reshape(tam_sel*3), v_sel.reshape(tam_sel*3))).astype("float128")
     z = list(map(str, z))
-    mas = expand_masses(m_sel)
+    mas = list(map(str, m_sel))
     return z, mas, noms_sel
 
 def llegirfit(fit):
@@ -52,18 +50,4 @@ def llegirfit(fit):
             q[i][0], q[i][1], q[i][2] = lin[1], lin[2], lin[3]
             v[i][0], v[i][1], v[i][2] = lin[4], lin[5], lin[6]
     return m, q, v, noms
-    
-def expand_masses(vec):
-    npl = len(vec)
-    Gm, GM, Gmb, nu, mu = list(vec).copy(), [0.0]*npl, [0.0]*npl, [0.0]*npl, [0.0]*npl
-    GM[0] = Gm[0]
-    for i in range(npl):
-        GM[i] = GM[i - 1] + Gm[i]
-    Gmb[0] = GM[npl - 1]
-    nu[0] = Gm[0]/GM[0]
-    mu[0] = 0.0
-    for i in range(1, npl):
-        Gmb[i] = GM[i - 1]*Gm[i]/GM[i]
-        nu[i] = Gm[i]/GM[i]
-        mu[i] = Gm[0]*Gm[i]/Gmb[i]
-    return list(map(str, Gm + GM + Gmb + nu + mu))
+
