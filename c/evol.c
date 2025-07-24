@@ -47,7 +47,7 @@ void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 
 void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr) {
   int i, j, Nf, Nmod, tam = np*3*2, punts;
-  quad H0, HF, erH, t = 0.0;
+  quad H0, HF, erH, t, sumcP;
   quad e[tam], ec[tam], zc[tam], zp[tam], x_adj[tam], y_adj[tam];
   FILE *arxiu;
 
@@ -66,11 +66,13 @@ void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad *
 
   H0 = hH(z, params, np);
   pasAB(z, e, params, np, h, x, y, sp, pA, pB);
-  t = sp > 0 ? h : 0.0;
-  Nf = Nm - 2*abs((int) round(suma(x, sp)));
+  sumcP = round(suma(x, sp));
+  t = h*sumcP;
+  Nf = Nm - 2*abs((int) sumcP);
   punts = p_impr > 0 ? p_impr : 100;
   Nmod = Nf > punts ? Nf/punts : 1;
-  
+  /* printf("h = %.34Qe,  t = %.34Qe, sumcP = %.34Qe\n", h, t, sumcP); */
+  /* exit(-1); */
   for (i = 0; i < Nf; i++) {
     pasABA(z, e, params, np, h, a, b, s, pA, pB);
     t += h;
@@ -81,8 +83,8 @@ void evolABAsc(quad * z, quad * params, int np, int Nm, quad h, quad * a, quad *
       HF = hH(zc, params, np);
       erH = fabsq((HF - H0)/H0);
       if (nom_arxiu != NULL) {
-	fprintf(arxiu, "%.34Qe %.34Qe %.34Qe %.34Qe ", t + h, H0, HF, erH);
-	jacobi2cart(zp, zc, params, np); // aquesta línia hi hauria que generalitzarla
+	fprintf(arxiu, "%.34Qe %.34Qe %.34Qe %.34Qe ", t + h*sumcP, H0, HF, erH);
+	jacobi2cart(zp, zc, params, np); // aquesta línia hi hauria que generalitzar-la
 	for (j = 0; j < tam - 1; j++)
 	  fprintf(arxiu, "%.34Qe ", zp[j]);
 	fprintf(arxiu, "%.34Qe\n", zp[tam - 1]);

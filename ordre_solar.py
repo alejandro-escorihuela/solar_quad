@@ -22,7 +22,7 @@ if __name__ == "__main__":
     titols = "Sistema Solar"
     # T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
     # T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
-    T, N = 2e5, (10**np.linspace(0.1, 7.0, 25)).astype(int)
+    T, N = 2e5, (10**np.linspace(0.1, 5.0, 25)).astype(int)
     # quins = [1, 0, 0, 0, 0, 0, 1]
     # quins = [1, 0, 0, 0, 0, 0, 1, 1]
     # quins = [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
@@ -44,9 +44,9 @@ if __name__ == "__main__":
             Nm = int(np.ceil(n/s))
             if Nm > Nm_ant:               
                 h = T/Nm
-                # lerH, lerQ = evolABA_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
-                lerH, lerQ = evolABA_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
-                errkv_e.append(lerH)
+                lerH, lerQ = evolABA_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
+                # lerH, lerQ = evolABA_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
+                errkv_e.append(lerQ)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)
                 print("NIA[%02d] = %12.12s -> (ex = %03d/%03d, s = %02d, h = %e, Nm = %07d, Nava = %07d, s/h = %.4e, Tf = %.3e, log10(erH) = %7.3f, log10(erQ) = %7.3f)"

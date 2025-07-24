@@ -20,9 +20,9 @@ from evol import *
 
 if __name__ == "__main__":
     T, h, punts = 2e5, 87.95/2, 2000
-    T, h, punts = 2e6, 20, 10000
-    # T, h, punts = 2e6, 6, int(2e6//6)
-    Nfixes = 3*T/h
+    T, h, punts = 2e5, 100, 10000
+    #T, h, punts = 2e6, 6, int(2e6//6)
+    Nfixes = 8*T/h
     # quins = [1, 0, 0, 0, 0, 0, 1]
     # quins = [1, 0, 0, 0, 0, 0, 1, 1]
     # quins = [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
