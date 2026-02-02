@@ -6,7 +6,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
-#from decimal import *
+# from decimal import *
 import numpy as np
 import sys
 sys.path.insert(0, './py')
@@ -14,9 +14,9 @@ from metsNIA import *
 from solar import *
 from evol import *
 
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica'], 'size' : 18})
-#rc('text', usetex=True)
-#plt.rcParams['figure.dpi'] = 288
+# rc('font',**{'family':'sans-serif','sans-serif':['Helvetica'], 'size' : 18})
+# rc('text', usetex=True)
+# plt.rcParams['figure.dpi'] = 288
 
 if __name__ == "__main__":
     T, h, punts = 2e5, 87.95/2, 2000
