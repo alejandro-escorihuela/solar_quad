@@ -1,7 +1,7 @@
 # 06-06-2024
 # alex
 
-OBJ = vector.so solar.so evol.so # Objectes
+OBJ = vector.so solar.so kpert.so evol.so # Objectes
 ICC = /opt/intel/oneapi/compiler/2024.0/bin/icx  # Compilador C intel
 # Per al compilador d'intel primer:
 # $ export LD_LIBRARY_PATH="/opt/intel/oneapi/compiler/latest/lib:/usr/local/lib"
@@ -22,7 +22,11 @@ solar.so: solar.c solar.h vector.h
 	@echo Compilant $<
 	$(COM) $(OPC) $< -o $@ $(LIB)
 
-evol.so: evol.c evol.h vector.h solar.h
+kpert.so: kpert.c kpert.h vector.h
+	@echo Compilant $<
+	$(COM) $(OPC) $< -o $@ $(LIB)
+
+evol.so: evol.c evol.h vector.h solar.h kpert.h
 	@echo Compilant $<
 	$(COM) $(OPC) $< -o $@ $(LIB)
 

@@ -22,7 +22,13 @@ evol.evolABAsolar_errH.restype = ct.c_void_p
 evol.evolABAsolar_errQ.restype = ct.c_void_p
 evol.evolABAsolar_errHQ.restype = ct.c_void_p
 
-def evolABAsolar(z, par, Nm, h, a, b, x, y, nom_fit, punts):
+fun_evo = [evol.evolABAsolar]#, evol.evolABAkpert]
+fun_err = [
+    [evol.evolABAsolar_errH, evol.evolABAsolar_errQ, evol.evolABAsolar_errHQ],
+    #[evol.evolABAkpert_errH, evol.evolABAkpert_errQ, evol.evolABAkpert_errHQ]
+]
+
+def evolABA(prob, z, par, Nm, h, a, b, x, y, nom_fit, punts):
     global evol
     np = len(par)
     par_c = (ct.c_char_p*np)()
@@ -38,10 +44,10 @@ def evolABAsolar(z, par, Nm, h, a, b, x, y, nom_fit, punts):
     x_c[:] = [item.encode() for item in x]
     y_c[:] = [item.encode() for item in y]
     nom_fit_c = ct.c_char_p(nom_fit.encode())
-    evol.evolABAsolar(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), nom_fit_c, punts)
+    fun_evo[prob](z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), nom_fit_c, punts)
     del par_c, z_c, a_c, b_c, x_c, y_c, nom_fit_c
-
-def evolABA_errH(z, par, Nm, h, a, b, x, y):
+    
+def evolABA_err(prob, err, z, par, Nm, h, a, b, x, y):
     global evol
     np = len(par)
     par_c = (ct.c_char_p*np)()
@@ -57,46 +63,91 @@ def evolABA_errH(z, par, Nm, h, a, b, x, y):
     x_c[:] = [item.encode() for item in x]
     y_c[:] = [item.encode() for item in y]
     erH = ct.c_longdouble(0.0)
-    evol.evolABAsolar_errH(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH))
+    erQ = ct.c_longdouble(0.0)
+    fun_err[prob][err](z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH), ct.byref(erQ))
+    ret_val = [erH.value, erQ.value, (erH.value, erQ.value)]
     del par_c, z_c, a_c, b_c, x_c, y_c
-    return erH.value
+    return ret_val[err]
 
-def evolABA_errQ(z, par, Nm, h, a, b, x, y):
-    global evol
-    np = len(par)
-    par_c = (ct.c_char_p*np)()
-    z_c = (ct.c_char_p*len(z))()
-    a_c = (ct.c_char_p*len(a))()
-    b_c = (ct.c_char_p*len(b))()
-    x_c = (ct.c_char_p*len(x))()
-    y_c = (ct.c_char_p*len(y))()
-    par_c[:] = [item.encode() for item in par]
-    z_c[:] = [item.encode() for item in z]
-    a_c[:] = [item.encode() for item in a]
-    b_c[:] = [item.encode() for item in b]
-    x_c[:] = [item.encode() for item in x]
-    y_c[:] = [item.encode() for item in y]    
-    erQ = ct.c_longdouble(0.0)
-    evol.evolABAsolar_errQ(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erQ))
-    return erQ.value
+def evolABAsolar(z, par, Nm, h, a, b, x, y, nom_fit, punts):
+    evolABA(0, z, par, Nm, h, a, b, x, y, nom_fit, punts)
+    # global evol
+    # np = len(par)
+    # par_c = (ct.c_char_p*np)()
+    # z_c = (ct.c_char_p*len(z))()
+    # a_c = (ct.c_char_p*len(a))()
+    # b_c = (ct.c_char_p*len(b))()
+    # x_c = (ct.c_char_p*len(x))()
+    # y_c = (ct.c_char_p*len(y))()
+    # par_c[:] = [item.encode() for item in par]
+    # z_c[:] = [item.encode() for item in z]
+    # a_c[:] = [item.encode() for item in a]
+    # b_c[:] = [item.encode() for item in b]
+    # x_c[:] = [item.encode() for item in x]
+    # y_c[:] = [item.encode() for item in y]
+    # nom_fit_c = ct.c_char_p(nom_fit.encode())
+    # evol.evolABAsolar(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), nom_fit_c, punts)
+    # del par_c, z_c, a_c, b_c, x_c, y_c, nom_fit_c
 
-def evolABA_errHQ(z, par, Nm, h, a, b, x, y):
-    global evol
-    np = len(par)
-    par_c = (ct.c_char_p*np)()
-    z_c = (ct.c_char_p*len(z))()
-    a_c = (ct.c_char_p*len(a))()
-    b_c = (ct.c_char_p*len(b))()
-    x_c = (ct.c_char_p*len(x))()
-    y_c = (ct.c_char_p*len(y))()
-    par_c[:] = [item.encode() for item in par]
-    z_c[:] = [item.encode() for item in z]
-    a_c[:] = [item.encode() for item in a]
-    b_c[:] = [item.encode() for item in b]
-    x_c[:] = [item.encode() for item in x]
-    y_c[:] = [item.encode() for item in y]
-    erH = ct.c_longdouble(0.0)
-    erQ = ct.c_longdouble(0.0)
-    evol.evolABAsolar_errHQ(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH), ct.byref(erQ))
-    return (erH.value, erQ.value)
+def evolABAsolar_errH(z, par, Nm, h, a, b, x, y):
+    return evolABA_err(0, 0, z, par, Nm, h, a, b, x, y)
+    # global evol
+    # np = len(par)
+    # par_c = (ct.c_char_p*np)()
+    # z_c = (ct.c_char_p*len(z))()
+    # a_c = (ct.c_char_p*len(a))()
+    # b_c = (ct.c_char_p*len(b))()
+    # x_c = (ct.c_char_p*len(x))()
+    # y_c = (ct.c_char_p*len(y))()
+    # par_c[:] = [item.encode() for item in par]
+    # z_c[:] = [item.encode() for item in z]
+    # a_c[:] = [item.encode() for item in a]
+    # b_c[:] = [item.encode() for item in b]
+    # x_c[:] = [item.encode() for item in x]
+    # y_c[:] = [item.encode() for item in y]
+    # erH = ct.c_longdouble(0.0)
+    # evol.evolABAsolar_errH(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH))
+    # del par_c, z_c, a_c, b_c, x_c, y_c
+    # return erH.value
+
+def evolABAsolar_errQ(z, par, Nm, h, a, b, x, y):
+    return evolABA_err(0, 1, z, par, Nm, h, a, b, x, y)
+    # global evol
+    # np = len(par)
+    # par_c = (ct.c_char_p*np)()
+    # z_c = (ct.c_char_p*len(z))()
+    # a_c = (ct.c_char_p*len(a))()
+    # b_c = (ct.c_char_p*len(b))()
+    # x_c = (ct.c_char_p*len(x))()
+    # y_c = (ct.c_char_p*len(y))()
+    # par_c[:] = [item.encode() for item in par]
+    # z_c[:] = [item.encode() for item in z]
+    # a_c[:] = [item.encode() for item in a]
+    # b_c[:] = [item.encode() for item in b]
+    # x_c[:] = [item.encode() for item in x]
+    # y_c[:] = [item.encode() for item in y]    
+    # erQ = ct.c_longdouble(0.0)
+    # evol.evolABAsolar_errQ(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erQ))
+    # return erQ.value
+
+def evolABAsolar_errHQ(z, par, Nm, h, a, b, x, y):
+    return evolABA_err(0, 2, z, par, Nm, h, a, b, x, y)
+    # global evol
+    # np = len(par)
+    # par_c = (ct.c_char_p*np)()
+    # z_c = (ct.c_char_p*len(z))()
+    # a_c = (ct.c_char_p*len(a))()
+    # b_c = (ct.c_char_p*len(b))()
+    # x_c = (ct.c_char_p*len(x))()
+    # y_c = (ct.c_char_p*len(y))()
+    # par_c[:] = [item.encode() for item in par]
+    # z_c[:] = [item.encode() for item in z]
+    # a_c[:] = [item.encode() for item in a]
+    # b_c[:] = [item.encode() for item in b]
+    # x_c[:] = [item.encode() for item in x]
+    # y_c[:] = [item.encode() for item in y]
+    # erH = ct.c_longdouble(0.0)
+    # erQ = ct.c_longdouble(0.0)
+    # evol.evolABAsolar_errHQ(z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH), ct.byref(erQ))
+    # return (erH.value, erQ.value)
 

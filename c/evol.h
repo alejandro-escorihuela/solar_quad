@@ -9,6 +9,7 @@
 #include <quadmath.h>
 #include "vector.h"
 #include "solar.h"
+#include "kpert.h"
 
 typedef void (* fluxe) (quad *, quad *, quad *, quad, int);
 typedef quad (* qcons) (quad *, quad *, int);

@@ -44,8 +44,8 @@ if __name__ == "__main__":
             Nm = int(np.ceil(n/s))
             if Nm > Nm_ant:               
                 h = T/Nm
-                lerH, lerQ = evolABA_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
-                # lerH, lerQ = evolABA_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
+                lerH, lerQ = evolABAsolar_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
+                # lerH, lerQ = evolABAsolar_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
                 errkv_e.append(lerQ)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)

@@ -8,7 +8,7 @@
 void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
   /* Sergio Blanes and Fernando Casas: A Concise Introduction to Geometric Numerical Integrator p[28,29] */
   /* Adapted to compensated summation by Ander Murua */
-  quad q[3], v[3], q_ant[3], v_ant[3];
+  quad q[3], v[3];
   quad t, mu, r0, v02, u, a;
   quad c, s, s2, sig, psi, w, x, dx, adx, adx_ant;
   quad fft, gg, fp, gpt, aux;
@@ -16,9 +16,8 @@ void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
 
   if (i > 0) {
     for (j = 0; j < 3; j++) {
-      q[j] = q_ant[j] = z[IND_Q(i, j, np)];
-      v[j] = v_ant[j] = z[IND_P(i, j, np)];
-
+      q[j] = z[IND_Q(i, j, np)];
+      v[j] = z[IND_P(i, j, np)];
     }
     t = h;
     mu = par[np + i];
@@ -47,8 +46,8 @@ void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
     fp = (-a*w*s)/(aux*r0);
     gpt = -s2/aux;
     for (j = 0; j < 3; j++) {
-      dz[IND_Q(i, j, np)] = fft*q_ant[j] + gg*v_ant[j];
-      dz[IND_P(i, j, np)] = fp*q_ant[j] + gpt*v_ant[j];
+      dz[IND_Q(i, j, np)] = fft*q[j] + gg*v[j];
+      dz[IND_P(i, j, np)] = fp*q[j] + gpt*v[j];
     }
   }
 }
