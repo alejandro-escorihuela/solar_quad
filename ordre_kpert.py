@@ -19,13 +19,13 @@ from evol import *
 #plt.rcParams['figure.dpi'] = 288
 
 if __name__ == "__main__":
-    titols = "Sistema Solar"
     # T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
     # T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
     T, N = 50*2*np.pi, (10**np.linspace(3.5, 5.0, 25)).astype(int)
     exc, eps, alp = 0.7, 0.001, 0
     zini, params = inikpert(exc, eps, alp)
-    print("Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc))
+    titols = "Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc)
+    print(titols)
     print(zini)
     
     errkv, navav = [], []
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             if Nm > Nm_ant:               
                 h = T/Nm
                 lerH, lerQ = evolABAkpert_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
-                # lerH, lerQ = evolABAkpert_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
+                #lerH, lerQ = evolABAkpert_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
                 errkv_e.append(lerQ)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)

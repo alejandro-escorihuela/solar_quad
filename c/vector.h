@@ -12,7 +12,7 @@
 typedef long double real;
 typedef __float128 quad;
 
-quad dot(quad * v1, quad * v2);
+quad dot(quad * v1, quad * v2, int tam);
 void copy(quad * v1, quad * v2, int tam);   /* v1 <- v2 */
 void adjunt(quad * v1, quad * v2, int tam); /* v1 <- adj(v2)*/
 quad suma(quad * v1, int tam);

@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include "vector.h"
 
-quad dot(quad * v1, quad * v2) {
+quad dot(quad * v1, quad * v2, int tam) {
   int i;
   quad ret = 0.0;
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < tam; i++)
     ret += v1[i]*v2[i];
   return ret;
 }

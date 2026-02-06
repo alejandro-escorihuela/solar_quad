@@ -21,9 +21,9 @@ void kepler_sc(quad * z, quad * dz, int nz, quad * par, int i, quad h, int np) {
     }
     t = h;
     mu = par[np + i];
-    r0 = sqrtq(dot(q, q));
-    v02 = dot(v, v);
-    u = dot(q, v);
+    r0 = sqrtq(dot(q, q, 3));
+    v02 = dot(v, v, 3);
+    u = dot(q, v, 3);
     a = -mu/(v02 - ((2.0*mu)/r0));
     w = sqrtq(mu/(a*a*a));
     sig = 1.0 - r0/a;
