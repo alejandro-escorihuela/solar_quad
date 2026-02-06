@@ -11,14 +11,14 @@
 #include "solar.h"
 #include "kpert.h"
 
-typedef void (* fluxe) (quad *, quad *, quad *, quad, int);
-typedef quad (* qcons) (quad *, quad *, int);
+typedef void (* fluxe) (quad *, quad *, int, quad *, quad, int);
+typedef quad (* qcons) (quad *, int, quad *, int);
+typedef void (* funpr) (quad *, quad *, quad *, int);
 
-void psc(fluxe phi, quad * z, quad * e, quad * params, quad h, int np);
-void pasABA(quad * z, quad * e, quad * params, int np, quad h, quad * a, quad * b, int s, fluxe pA, fluxe pB);
-void pasAB(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
-void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
-
+void psc(fluxe phi, quad * z, quad * e, int nz, quad * params, quad h, int np);
+void pasABA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * a, quad * b, int s, fluxe pA, fluxe pB);
+void pasAB(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
+void pasBA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB);
 /* Input/Output: */
 /*   z: coordenades q i v */
 /* Input: */
@@ -32,7 +32,7 @@ void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y
 /*   hH: funció de la quantitat conservada */
 /* Output: */
 /*   maxerH: màxim error de la quatitat conservada */
-void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr);
+void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr, funpr preprint);
 
 /* Funcions solar */
 void evolABAsolar(const char ** z, int nz, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, const char * nom_arxiu, int p_impr);

@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include "evol.h"
 
-void psc(fluxe phi, quad * z, quad * e, quad * params, quad h, int np) {
-  int i, tam = np*3*2;
-  quad a[tam], d[tam];
+void psc(fluxe phi, quad * z, quad * e, int nz, quad * params, quad h, int np) {
+  int i;
+  quad a[nz], d[nz];
 
-  zeros(d, tam);
-  copy(a, z, tam);
-  phi(z, d, params, h, np); 
-  for (i = 0; i < tam; i++) {
+  zeros(d, nz);
+  copy(a, z, nz);
+  phi(z, d, nz, params, h, np); 
+  for (i = 0; i < nz; i++) {
     e[i] += d[i];
     z[i] = a[i] + e[i];
     e[i] += (a[i] - z[i]);
@@ -20,35 +20,35 @@ void psc(fluxe phi, quad * z, quad * e, quad * params, quad h, int np) {
 
 }
 
-void pasABA(quad * z, quad * e, quad * params, int np, quad h, quad * a, quad * b, int s, fluxe pA, fluxe pB) {
+void pasABA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * a, quad * b, int s, fluxe pA, fluxe pB) {
   int j;
   for (j = 0; j < s; j++) {
-    psc(pA, z, e, params, a[j]*h, np);
-    psc(pB, z, e, params, b[j]*h, np);
+    psc(pA, z, e, nz, params, a[j]*h, np);
+    psc(pB, z, e, nz, params, b[j]*h, np);
   }
-  psc(pA, z, e, params, a[s]*h, np);
+  psc(pA, z, e, nz, params, a[s]*h, np);
 }
 
-void pasAB(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB) {
+void pasAB(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB) {
   int j;
   for (j = 0; j < sp; j++) {
-    psc(pA, z, e, params, x[j]*h, np);
-    psc(pB, z, e, params, y[j]*h, np);
+    psc(pA, z, e, nz, params, x[j]*h, np);
+    psc(pB, z, e, nz, params, y[j]*h, np);
   }
 }
 
-void pasBA(quad * z, quad * e, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB) {
+void pasBA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, quad * y, int sp, fluxe pA, fluxe pB) {
   int j;
   for (j = 0; j < sp; j++) {
-    psc(pB, z, e, params, y[j]*h, np);
-    psc(pA, z, e, params, x[j]*h, np);
+    psc(pB, z, e, nz, params, y[j]*h, np);
+    psc(pA, z, e, nz, params, x[j]*h, np);
   }
 }
 
-void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr) {
-  int i, j, Nf, Nmod, tam = np*3*2, punts;
+void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr, funpr preprint) {
+  int i, j, Nf, Nmod, punts;
   quad H0, HF, erH, t, sumcP;
-  quad e[tam], ec[tam], zc[tam], zp[tam], x_adj[tam], y_adj[tam];
+  quad e[nz], ec[nz], zc[nz], zp[nz], x_adj[nz], y_adj[nz];
   FILE *arxiu;
 
   if (nom_arxiu != NULL) {
@@ -60,12 +60,12 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
   }
   
   *maxerH = 0.0;
-  zeros(e, tam);
+  zeros(e, nz);
   adjunt(x_adj, x, sp);
   adjunt(y_adj, y, sp);
 
-  H0 = hH(z, params, np);
-  pasAB(z, e, params, np, h, x, y, sp, pA, pB);
+  H0 = hH(z, nz, params, np);
+  pasAB(z, e, nz, params, np, h, x, y, sp, pA, pB);
   sumcP = round(suma(x, sp));
   t = h*sumcP;
   Nf = Nm - 2*abs((int) sumcP);
@@ -74,26 +74,27 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
   /* printf("h = %.34Qe,  t = %.34Qe, sumcP = %.34Qe\n", h, t, sumcP); */
   /* exit(-1); */
   for (i = 0; i < Nf; i++) {
-    pasABA(z, e, params, np, h, a, b, s, pA, pB);
+    pasABA(z, e, nz, params, np, h, a, b, s, pA, pB);
     t += h;
     if (i % Nmod == 0) {
-      copy(zc, z, tam);
-      copy(ec, e, tam);
-      pasBA(zc, ec, params, np, h, x_adj, y_adj, sp, pA, pB);
-      HF = hH(zc, params, np);
+      copy(zc, z, nz);
+      copy(ec, e, nz);
+      pasBA(zc, ec, nz, params, np, h, x_adj, y_adj, sp, pA, pB);
+      HF = hH(zc, nz, params, np);
       erH = fabsq((HF - H0)/H0);
       if (nom_arxiu != NULL) {
 	fprintf(arxiu, "%.34Qe %.34Qe %.34Qe %.34Qe ", t + h*sumcP, H0, HF, erH);
-	jacobi2cart(zp, zc, params, np); // aquesta línia hi hauria que generalitzar-la
-	for (j = 0; j < tam - 1; j++)
+	preprint(zp, zc, params, np);
+	//jacobi2cart(zp, zc, params, np); // aquesta línia hi hauria que generalitzar-la
+	for (j = 0; j < nz - 1; j++)
 	  fprintf(arxiu, "%.34Qe ", zp[j]);
-	fprintf(arxiu, "%.34Qe\n", zp[tam - 1]);
+	fprintf(arxiu, "%.34Qe\n", zp[nz - 1]);
       }
       if (erH > *maxerH)
 	*maxerH = erH;
     }
   }
-  pasBA(z, e, params, np, h, x_adj, y_adj, sp, pA, pB);
+  pasBA(z, e, nz, params, np, h, x_adj, y_adj, sp, pA, pB);
 
   if (nom_arxiu != NULL)
     fclose(arxiu);
@@ -114,7 +115,7 @@ void evolABAsolar(const char ** z, int nz, const char ** params, int np, int Nm,
   expand_masses(masq, paramsq, np);
   centrar(zq, masq, np);
   cart2jacobi(zbq, zq, masq, np);
-  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err, nom_arxiu, p_impr);
+  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err, nom_arxiu, p_impr, jacobi2cart);
   jacobi2cart(zq, zbq, masq, np);
 }
 
@@ -133,7 +134,7 @@ void evolABAsolar_errH(const char ** z, int nz, const char ** params, int np, in
   expand_masses(masq, paramsq, np);
   centrar(zq, masq, np);
   cart2jacobi(zbq, zq, masq, np);
-  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err, NULL, 0);
+  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &err, NULL, 0, NULL);
   jacobi2cart(zq, zbq, masq, np);
   *lerH = quad2real(log10q(err));
 
@@ -161,9 +162,9 @@ void evolABAsolar_errHQ(const char ** z, int nz, const char ** params, int np, i
   centrar(zq, masq, np);
   cart2jacobi(zbq, zq, masq, np);
   copy(zbt, zbq, nz);
-  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0);
+  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   *lerH = quad2real(log10q(meh));
-  evolABAsc(zbt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0);
+  evolABAsc(zbt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   jacobi2cart(zq, zbq, masq, np);
   jacobi2cart(zt, zbt, masq, np);
   meq = difnorm2(zq, zt, nz/2);
@@ -184,7 +185,7 @@ void evolABAkpert(const char ** z, int nz, const char ** params, int np, int Nm,
   str2quadV(xq, x, sp);
   str2quadV(yq, y, sp);
 
-  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &err, nom_arxiu, p_impr);
+  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &err, nom_arxiu, p_impr, NULL);
 }
 
 void evolABAkpert_errH(const char ** z, int nz, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, real * lerH) {
@@ -199,7 +200,7 @@ void evolABAkpert_errH(const char ** z, int nz, const char ** params, int np, in
   str2quadV(xq, x, sp);
   str2quadV(yq, y, sp);
 
-  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &err, NULL, 0);
+  evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &err, NULL, 0, NULL);
   *lerH = quad2real(log10q(err));
 }
 
@@ -221,9 +222,9 @@ void evolABAkpert_errHQ(const char ** z, int nz, const char ** params, int np, i
   str2quadV(yq, y, sp);
 
   copy(zt, zq, nz);
-  evolABAsc(zq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &meh, NULL, 0);
+  evolABAsc(zq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham, &meh, NULL, 0, NULL);
   *lerH = quad2real(log10q(meh));
-  evolABAsc(zt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0);
+  evolABAsc(zt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   meq = difnorm2(zq, zt, nz/2);
   *lerQ = quad2real(log10q(meq));
 }
