@@ -22,6 +22,7 @@ void pasBA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, 
 /* Input/Output: */
 /*   z: coordenades q i v */
 /* Input: */
+/*   nz: dimensió de z */
 /*   params: parametres quads, en el cas solar les masses */
 /*   np: dimensió de params, en el cas solar nombre de planetes */
 /*   h: grandària de pas */
@@ -32,6 +33,7 @@ void pasBA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, 
 /*   hH: funció de la quantitat conservada */
 /* Output: */
 /*   maxerH: màxim error de la quatitat conservada */
+
 void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr, funpr preprint);
 
 /* Funcions solar */

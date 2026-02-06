@@ -227,4 +227,3 @@ void evolABAkpert_errHQ(const char ** z, int nz, const char ** params, int np, i
   evolABAsc(zt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   meq = difnorm2(zq, zt, nz/2);
   *lerQ = quad2real(log10q(meq));
-}
