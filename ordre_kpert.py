@@ -22,12 +22,12 @@ if __name__ == "__main__":
     titols = "Sistema Solar"
     # T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
     # T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
-    T, N = 2e5, (10**np.linspace(0.1, 5.0, 25)).astype(int)
-    exc, eps, alp = 0.8, 0.001, 0
-    params = [eps, alp]
-    zini = inikpert(exc)
-    print("Kepler pertorbat ϵ = %f, α = %f, e = %f" % (params[0], params[1], exc))
-
+    T, N = 50*2*np.pi, (10**np.linspace(3.5, 5.0, 25)).astype(int)
+    exc, eps, alp = 0.7, 0.001, 0
+    zini, params = inikpert(exc, eps, alp)
+    print("Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc))
+    print(zini)
+    
     errkv, navav = [], []
     ri = 0
     n_m = len(cofABA)
