@@ -49,10 +49,33 @@ void kepler_sc_kp(quad * z, quad * dz, quad h) {
   }
 }
 
-void phiscH0_kp(quad * z, quad * dz, quad * par, quad h, int np) {
+void phiscH0_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
   (void) par;
   (void) np;
   kepler_sc_kp(z, dz, h);
 }
-void phiscH1_kp(quad * z, quad * dz, quad * par, quad h, int np);
-quad ham_kp(quad * z, quad * par, int np);
+void phiscH1_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
+  int j;
+  for (j = 0; j < 3; j++) {
+    dz[j] = 0.0;
+    dz[j + 3] = 0.0;
+  }
+}
+
+quad ham_kp(quad * z, int nz, quad * par, int np) {
+  quad q[3], v[3];
+  quad eps = par[0], alp = 1.0Q;
+  quad r, r2, r3, A, eB;
+  int j;
+  
+  for (j = 0; j < 3; j++) {
+    q[j] = z[j];
+    v[j] = z[j + 3];
+  }
+  r = sqrtq(q[0]*q[0] + q[1]*q[1]);
+  r2 = r*r;
+  r3 = r2*r;
+  A = 0.5*(v[0]*v[0] + v[1]*v[1]) - 1/r;
+  eB = -eps*(1.0 - alp*(3*q[0]*q[0])/(r2))/(2*r3);
+  return A + eB;
+}

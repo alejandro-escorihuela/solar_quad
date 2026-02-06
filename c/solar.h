@@ -12,10 +12,10 @@
 #define IND_Q(I, J, NP) (3*I + J)
 #define IND_P(I, J, NP) (3*(I + NP) + J)
 
-void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np);
-void phiscHK(quad * z, quad * dz, quad * par, quad h, int np);
-void phiscHI(quad * z, quad * dz, quad * par, quad h, int np);
-quad ham(quad * z, quad * par, int np);
+void kepler_sc(quad * z, quad * dz, int nz, quad * par, int i, quad h, int np);
+void phiscHK(quad * z, quad * dz, int nz, quad * par, quad h, int np);
+void phiscHI(quad * z, quad * dz, int nz, quad * par, quad h, int np);
+quad ham(quad * z, int nz, quad * par, int np);
 
 void expand_masses(quad * par, quad * GM, int np);
 void centrar(quad * z, quad * par, int np) ;

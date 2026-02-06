@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "solar.h"
 
-void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
+void kepler_sc(quad * z, quad * dz, int nz, quad * par, int i, quad h, int np) {
   /* Sergio Blanes and Fernando Casas: A Concise Introduction to Geometric Numerical Integrator p[28,29] */
   /* Adapted to compensated summation by Ander Murua */
   quad q[3], v[3];
@@ -52,14 +52,14 @@ void kepler_sc(quad * z, quad * dz, quad * par, int i, quad h, int np) {
   }
 }
 
-void phiscHK(quad * z, quad * dz, quad * par, quad h, int np) {
+void phiscHK(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
   int i;
   
   for (i = 1; i < np; i++)
-    kepler_sc(z, dz, par, i, h, np);
+    kepler_sc(z, dz, nz, par, i, h, np);
 }
 
-void phiscHI(quad * z, quad * dz, quad * par, quad h, int np) {
+void phiscHI(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
   int i, j, k;
   quad nu[np], mu[np];  
   quad q[np][3], Q[np][3], qpp[np][3], qbpp[np][3];
@@ -115,7 +115,7 @@ void phiscHI(quad * z, quad * dz, quad * par, quad h, int np) {
   }
 }
 
-quad ham(quad * z, quad * par, int np) {
+quad ham(quad * z, int nz, quad * par, int np) {
   int i, j, k;
   quad zcart[3*np*2], cin = 0.0, pot = 0.0, q[np][3], v[np][3], resta[3];
   

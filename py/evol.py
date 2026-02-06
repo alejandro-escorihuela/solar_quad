@@ -10,12 +10,13 @@ import os
 
 vector = ct.CDLL(os.path.dirname(__file__) + "/../c/vector.so", mode = ct.RTLD_GLOBAL)
 solar = ct.CDLL(os.path.dirname(__file__) + "/../c/solar.so", mode = ct.RTLD_GLOBAL)
+kpert = ct.CDLL(os.path.dirname(__file__) + "/../c/kpert.so", mode = ct.RTLD_GLOBAL)
 evol = ct.CDLL(os.path.dirname(__file__) + "/../c/evol.so", mode = ct.RTLD_GLOBAL)
 
-evol.evolABAsolar.argtypes = (ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_char_p, ct.c_int)
-evol.evolABAsolar_errH.argtypes = (ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble))
-evol.evolABAsolar_errQ.argtypes = (ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble))
-evol.evolABAsolar_errHQ.argtypes = (ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble), ct.POINTER(ct.c_longdouble))
+evol.evolABAsolar.argtypes = (ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.c_char_p, ct.c_int)
+evol.evolABAsolar_errH.argtypes = (ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble))
+evol.evolABAsolar_errQ.argtypes = (ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble))
+evol.evolABAsolar_errHQ.argtypes = (ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.c_int, ct.c_int, ct.c_longdouble, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_char_p), ct.POINTER(ct.c_char_p), ct.c_int, ct.POINTER(ct.c_longdouble), ct.POINTER(ct.c_longdouble))
 
 evol.evolABAsolar.restype = ct.c_void_p
 evol.evolABAsolar_errH.restype = ct.c_void_p
@@ -30,7 +31,7 @@ fun_err = [
 
 def evolABA(prob, z, par, Nm, h, a, b, x, y, nom_fit, punts):
     global evol
-    np = len(par)
+    np, nz = len(par), len(z)
     par_c = (ct.c_char_p*np)()
     z_c = (ct.c_char_p*len(z))()
     a_c = (ct.c_char_p*len(a))()
@@ -44,12 +45,12 @@ def evolABA(prob, z, par, Nm, h, a, b, x, y, nom_fit, punts):
     x_c[:] = [item.encode() for item in x]
     y_c[:] = [item.encode() for item in y]
     nom_fit_c = ct.c_char_p(nom_fit.encode())
-    fun_evo[prob](z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), nom_fit_c, punts)
+    fun_evo[prob](z_c, nz, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), nom_fit_c, punts)
     del par_c, z_c, a_c, b_c, x_c, y_c, nom_fit_c
     
 def evolABA_err(prob, err, z, par, Nm, h, a, b, x, y):
     global evol
-    np = len(par)
+    np, nz = len(par), len(z)
     par_c = (ct.c_char_p*np)()
     z_c = (ct.c_char_p*len(z))()
     a_c = (ct.c_char_p*len(a))()
@@ -64,7 +65,7 @@ def evolABA_err(prob, err, z, par, Nm, h, a, b, x, y):
     y_c[:] = [item.encode() for item in y]
     erH = ct.c_longdouble(0.0)
     erQ = ct.c_longdouble(0.0)
-    fun_err[prob][err](z_c, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH), ct.byref(erQ))
+    fun_err[prob][err](z_c, nz, par_c, np, Nm, h, a_c, b_c, len(b), x_c, y_c, len(x), ct.byref(erH), ct.byref(erQ))
     ret_val = [erH.value, erQ.value, (erH.value, erQ.value)]
     del par_c, z_c, a_c, b_c, x_c, y_c
     return ret_val[err]
