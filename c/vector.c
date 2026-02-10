@@ -22,7 +22,7 @@ void copy(quad * v1, quad * v2, int tam) {
 void adjunt(quad * v1, quad * v2, int tam) {
   int i;
   for (i = 0; i < tam; i++)
-    v1[i] = -v2[tam - 1 - i];
+    v1[i] = v2[tam - 1 - i];
 }
 
 quad suma(quad * v1, int tam) {

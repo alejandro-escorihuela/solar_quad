@@ -57,33 +57,34 @@ void phiscH0_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
 }
 
 void phiscH1_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
-  int j;
-  quad q02, q12, r, r7, frc, eps = par[0], alp = par[1];
+  quad x2, y2, r7, frc, eps = par[0], alp = par[1];
 
-  q02 = z[0]*z[0];
-  q12 = z[1]*z[1];
-  r = sqrtq(q02 + q12);
-  r7 = powq(r, 7);
-  frc = -h*1.5*eps/r7;
+  x2 = z[0]*z[0];
+  y2 = z[1]*z[1];
+  r7 = powq(x2 + y2, 3.5);
+  frc = h*1.5*eps/r7;
   dz[0] = dz[1] = 0.0;
-  dz[2] = z[0]*((1 - 3*alp)*q02 + (1 + 2*alp)*q12)*frc;
-  dz[3] = z[1]*((1 - 5*alp)*q02 + q12)*frc;
+  //dz[2] = -z[0]*((1 - 3*alp)*x2 + (1 + 2*alp)*y2)*frc;
+  //dz[3] = -z[1]*((1 - 5*alp)*x2 + y2)*frc;
+  dz[2] = dz[3] = 0.0;
 }
 
 quad ham_kp(quad * z, int nz, quad * par, int np) {
   quad q[2], v[2];
   quad eps = par[0], alp = par[1];
-  quad r, r2, r3, A, eB;
+  quad x2, r, r2, r3, A, eB;
   int j;
   
   for (j = 0; j < 2; j++) {
     q[j] = z[j];
     v[j] = z[j + 2];
   }
-  r = sqrtq(q[0]*q[0] + q[1]*q[1]);
-  r2 = r*r;
+  x2 = q[0]*q[0];
+  r2 = x2 + q[1]*q[1];
+  r = sqrtq(r2);
   r3 = r2*r;
   A = 0.5*(v[0]*v[0] + v[1]*v[1]) - 1/r;
-  eB = -eps*(1.0 - alp*(3*q[0]*q[0])/(r2))/(2*r3);
-  return A + eB;
+  eB = -0.5*eps*(1.0 - 3*alp*x2/r2)/r3;
+  return A;
+  //return A + eB;
 }

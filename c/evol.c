@@ -47,7 +47,7 @@ void pasBA(quad * z, quad * e, int nz, quad * params, int np, quad h, quad * x, 
 void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, const char * nom_arxiu, int p_impr, funpr preprint) {
   int i, j, Nf, Nmod, punts;
   quad H0, HF, erH, t, sumcP;
-  quad e[nz], ec[nz], zc[nz], zp[nz], x_adj[nz], y_adj[nz];
+  quad e[nz], ec[nz], zc[nz], zp[nz], x_adj[sp], y_adj[sp];
   FILE *arxiu;
 
   if (nom_arxiu != NULL) {
@@ -65,12 +65,11 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
 
   H0 = hH(z, nz, params, np);
   pasAB(z, e, nz, params, np, h, x, y, sp, pA, pB);
-  sumcP = round(suma(x, sp));
+  sumcP = round(suma(x_adj, sp));
   t = h*sumcP;
   Nf = Nm - 2*abs((int) sumcP);
   punts = p_impr > 0 ? p_impr : 100;
   Nmod = Nf > punts ? Nf/punts : 1;
-
   for (i = 0; i < Nf; i++) {
     pasABA(z, e, nz, params, np, h, a, b, s, pA, pB);
     t += h;
@@ -93,7 +92,6 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
     }
   }
   pasBA(z, e, nz, params, np, h, x_adj, y_adj, sp, pA, pB);
-
   if (nom_arxiu != NULL)
     fclose(arxiu);
 }
@@ -162,7 +160,7 @@ void evolABAsolar_errHQ(const char ** z, int nz, const char ** params, int np, i
   copy(zbt, zbq, nz);
   evolABAsc(zbq, nz, masq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   *lerH = quad2real(log10q(meh));
-  evolABAsc(zbt, nz, masq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
+  evolABAsc(zbt, nz, masq, np, 2*Nm, hq/2, aq, bq, s, xq, yq, sp, phiscHK, phiscHI, ham, &meh, NULL, 0, NULL);
   jacobi2cart(zq, zbq, masq, np);
   jacobi2cart(zt, zbt, masq, np);
   meq = difnorm2(zq, zt, nz/2);
@@ -222,7 +220,7 @@ void evolABAkpert_errHQ(const char ** z, int nz, const char ** params, int np, i
   copy(zt, zq, nz);
   evolABAsc(zq, nz, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, NULL, 0, NULL);
   *lerH = quad2real(log10q(meh));
-  evolABAsc(zt, nz, paramsq, np, 2*(Nm - abs((int) round(suma(xq, sp)))), hq/2, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, NULL, 0, NULL);
+  evolABAsc(zt, nz, paramsq, np, 2*Nm, hq/2, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, NULL, 0, NULL);
   meq = difnorm2(zq, zt, nz/2);
   *lerQ = quad2real(log10q(meq));
 }
