@@ -351,8 +351,8 @@ cofABA, proABA = [], []
 # proABA.append([])
 # cofABA.append(estendreA(NIA7_864))
 # proABA.append([])
-cofABA.append(estendreA(NIA8_1064))
-proABA.append([]) 
+# cofABA.append(estendreA(NIA8_1064))
+# proABA.append([]) 
 # cofABA.append(estendreA(NIA8_1064))
 # proABA.append(PNIA14)
 # cofABA.append(estendreA(NIA884))
@@ -399,5 +399,5 @@ proABA.append(TNIA10_3x64)
 # proABA.append(TNA19_108)
 
 
-noms = ["NIA8_1064", "TNIA3_1064"]
-# noms = ["NIA8_1064", "NIA13_10864", "RNIA12_1086"]
+# noms = ["NIA8_1064", "TNIA3_1064"]
+noms = ["NIA8_1064", "NIA13_10864", "RNIA12_1086"]

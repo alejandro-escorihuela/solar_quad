@@ -20,9 +20,9 @@ from evol import *
 
 if __name__ == "__main__":
     # T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
-    T, N = 50*2*np.pi, (10**np.linspace(3.5, 4.5, 15)).astype(int)
+    T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 25)).astype(int)
     # T, N = 50*2*np.pi, (10**np.linspace(3.5, 5.0, 25)).astype(int)
-    exc, eps, alp = 0.7, 0.001, 0
+    exc, eps, alp = 0.8, 1e-4, 1.0
     zini, params = inikpert(exc, eps, alp)
     titols = "Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc)
     print(titols)
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             if Nm > Nm_ant:               
                 h = T/Nm
                 lerH, lerQ = evolABAkpert_errHQ(zini.copy(), params, Nm, h, a, b, x, y)
-                #lerH, lerQ = evolABAkpert_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
+                # lerH, lerQ = evolABAkpert_errH(zini.copy(), params, Nm, h, a, b, x, y), np.nan
                 errkv_e.append(lerQ)
                 # navav_e.append(s*Nm)
                 navav_e.append(s/h)

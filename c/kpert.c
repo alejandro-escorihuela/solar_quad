@@ -64,9 +64,8 @@ void phiscH1_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
   r7 = powq(x2 + y2, 3.5);
   frc = h*1.5*eps/r7;
   dz[0] = dz[1] = 0.0;
-  //dz[2] = -z[0]*((1 - 3*alp)*x2 + (1 + 2*alp)*y2)*frc;
-  //dz[3] = -z[1]*((1 - 5*alp)*x2 + y2)*frc;
-  dz[2] = dz[3] = 0.0;
+  dz[2] = -z[0]*((1 - 3*alp)*x2 + (1 + 2*alp)*y2)*frc;
+  dz[3] = -z[1]*((1 - 5*alp)*x2 + y2)*frc;
 }
 
 quad ham_kp(quad * z, int nz, quad * par, int np) {
@@ -85,6 +84,5 @@ quad ham_kp(quad * z, int nz, quad * par, int np) {
   r3 = r2*r;
   A = 0.5*(v[0]*v[0] + v[1]*v[1]) - 1/r;
   eB = -0.5*eps*(1.0 - 3*alp*x2/r2)/r3;
-  return A;
-  //return A + eB;
+  return A + eB;
 }
