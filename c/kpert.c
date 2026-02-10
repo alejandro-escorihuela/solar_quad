@@ -57,6 +57,8 @@ void phiscH0_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
 }
 
 void phiscH1_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
+  (void) nz;
+  (void) np;
   quad x2, y2, r7, frc, eps = par[0], alp = par[1];
 
   x2 = z[0]*z[0];
@@ -69,6 +71,8 @@ void phiscH1_kp(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
 }
 
 quad ham_kp(quad * z, int nz, quad * par, int np) {
+  (void) nz;
+  (void) np;
   quad q[2], v[2];
   quad eps = par[0], alp = par[1];
   quad x2, r, r2, r3, A, eB;

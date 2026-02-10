@@ -99,18 +99,18 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
 void evolABAsc2(quad * z, quad * z2, int nz, quad * params, int np, int Nm, quad h, int fact, quad * a, quad * b, int s, quad * x, quad * y, int sp, fluxe pA, fluxe pB, qcons hH, quad * maxerH, int p_impr) {
   int i, j, Nf, Nmod, punts;
   quad h2 = h/fact, H0, HF, erH, t, sumcP;
-  quad e[nz], e2[nz], ec[nz], zc[nz], zp[nz], x_adj[sp], y_adj[sp];
+  quad e[nz], e2[nz], ec[nz], zc[nz], x_adj[sp], y_adj[sp];
 
   *maxerH = 0.0;
   zeros(e, nz);
   zeros(e2, nz);
   adjunt(x_adj, x, sp);
   adjunt(y_adj, y, sp);
-
+  
   H0 = hH(z, nz, params, np);
   pasAB(z, e, nz, params, np, h, x, y, sp, pA, pB);
   pasAB(z2, e2, nz, params, np, h2, x, y, sp, pA, pB);
-  sumcP = round(suma(x_adj, sp));
+  sumcP = round(suma(x, sp));
   if (sumcP > 0)
     for (j = 0; j < fact - 1; j++)
       pasABA(z2, e2, nz, params, np, h2, a, b, s, pA, pB);
@@ -137,7 +137,7 @@ void evolABAsc2(quad * z, quad * z2, int nz, quad * params, int np, int Nm, quad
   if (sumcP > 0)
     for (j = 0; j < fact - 1; j++)
       pasABA(z2, e2, nz, params, np, h2, a, b, s, pA, pB);
-  pasBA(z2, e2, nz, params, np, h2, x, y, sp, pA, pB);
+  pasBA(z2, e2, nz, params, np, h2, x_adj, y_adj, sp, pA, pB);
 }
 
 void evolABAsolar(const char ** z, int nz, const char ** params, int np, int Nm, real h, const char ** a, const char ** b, int s, const char ** x, const char ** y, int sp, const char * nom_arxiu, int p_impr) {
@@ -267,8 +267,6 @@ void evolABAkpert_errHQ(const char ** z, int nz, const char ** params, int np, i
   /* evolABAsc(zq, nz, paramsq, np, Nm, hq, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, NULL, 0, NULL); */
   /* *lerH = quad2real(log10q(meh)); */
   /* evolABAsc(zt, nz, paramsq, np, 2*Nm, hq/2, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, NULL, 0, NULL); */
-  /* meq = difnorm2(zq, zt, nz/2); */
-  /* *lerQ = quad2real(log10q(meq)); */
   evolABAsc2(zq, zt, nz, paramsq, np, Nm, hq, 2, aq, bq, s, xq, yq, sp, phiscH0_kp, phiscH1_kp, ham_kp, &meh, 0);
   *lerH = quad2real(log10q(meh));
   meq = difnorm2(zq, zt, nz/2);

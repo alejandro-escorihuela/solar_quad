@@ -54,12 +54,12 @@ void printV(quad * v1, const char * nom, int tam) {
   printf("%s = {", nom);
   for (i = 0; i < tam - 1; i++) {
     if (i % 3 == 0)
-      printf("\n  ");    
+      printf("\n  ");
     printf("%02d => %.34Qe, ", i, v1[i]);
 
   }
   if ((tam - 1) % 3 == 0)
-    printf("\n  "); 
+    printf("\n  ");
   printf("%02d => %.34Qe\n}\n", tam - 1, v1[tam - 1]);
   
 }

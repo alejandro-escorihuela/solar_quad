@@ -8,12 +8,13 @@
 void kepler_sc(quad * z, quad * dz, int nz, quad * par, int i, quad h, int np) {
   /* Sergio Blanes and Fernando Casas: A Concise Introduction to Geometric Numerical Integrator p[28,29] */
   /* Adapted to compensated summation by Ander Murua */
+  (void) nz;
   quad q[3], v[3];
   quad t, mu, r0, v02, u, a;
   quad c, s, s2, sig, psi, w, x, dx, adx, adx_ant;
   quad fft, gg, fp, gpt, aux;
   int j;
-
+  
   if (i > 0) {
     for (j = 0; j < 3; j++) {
       q[j] = z[IND_Q(i, j, np)];
@@ -60,6 +61,7 @@ void phiscHK(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
 }
 
 void phiscHI(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
+  (void) nz;
   int i, j, k;
   quad nu[np], mu[np];  
   quad q[np][3], Q[np][3], qpp[np][3], qbpp[np][3];
@@ -116,9 +118,10 @@ void phiscHI(quad * z, quad * dz, int nz, quad * par, quad h, int np) {
 }
 
 quad ham(quad * z, int nz, quad * par, int np) {
+  (void) nz;
   int i, j, k;
   quad zcart[3*np*2], cin = 0.0, pot = 0.0, q[np][3], v[np][3], resta[3];
-  
+ 
   jacobi2cart(zcart, z, par, np);
   for (i = 0; i < np; i++)
     for (j = 0; j < 3; j++) {
