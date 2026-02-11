@@ -19,7 +19,7 @@ from evol import *
 #plt.rcParams['figure.dpi'] = 288
 
 if __name__ == "__main__":
-    T, N = 50*2*np.pi, (10**np.linspace(4.0, 6.0, 25)).astype(int)
+    T, N = 50*2*np.pi, (10**np.linspace(4.0, 7.0, 25)).astype(int)
     # T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 25)).astype(int)
     exc, eps, alp = 0.8, 1e-4, 1.0
     zini, params = inikpert(exc, eps, alp)
