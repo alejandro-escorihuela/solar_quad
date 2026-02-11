@@ -18,7 +18,7 @@ void phiscHI(quad * z, quad * dz, int nz, quad * par, quad h, int np);
 quad ham(quad * z, int nz, quad * par, int np);
 
 void expand_masses(quad * par, quad * GM, int np);
-void centrar(quad * z, quad * par, int np) ;
+void centrar(quad * z, quad * par, int np);
 void cart2jacobi(quad * zb, quad * z, quad * par, int np);
 void jacobi2cart(quad * z, quad * zb, quad * par, int np);
 #endif

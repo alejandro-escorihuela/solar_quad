@@ -32,4 +32,4 @@ evol.so: evol.c evol.h vector.h solar.h kpert.h
 
 clean:
 	@echo Netejant...
-	rm -rf $(OBJ) *~
+	rm -rf $(OBJ) *_d.so *~

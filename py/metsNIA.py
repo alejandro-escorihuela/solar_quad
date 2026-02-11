@@ -375,14 +375,14 @@ proABA.append([])
 # proABA.append(TNIA8_3x64B)
 # cofABA.append(estendreA(NIA3_x64))
 # proABA.append(TNIA10_3x64)
-cofABA.append(estendreA(NIA5_x64))
-proABA.append(TNIA8_5x64)
-cofABA.append(estendreA(NIA5_x64))
-proABA.append(TNIA10_5x64)
-# cofABA.append(estendreA(NIA7_x864))
-# proABA.append(TNIA8_7x864)
-# cofABA.append(estendreA(NIA7_x864))
-# proABA.append(TNIA10_7x864)
+# cofABA.append(estendreA(NIA5_x64))
+# proABA.append(TNIA8_5x64)
+# cofABA.append(estendreA(NIA5_x64))
+# proABA.append(TNIA10_5x64)
+cofABA.append(estendreA(NIA7_x864))
+proABA.append(TNIA8_7x864)
+cofABA.append(estendreA(NIA7_x864))
+proABA.append(TNIA10_7x864)
 # cofABA.append(estendreA(NA7))
 # proABA.append([])
 # cofABA.append(estendreA(NA7))
@@ -399,6 +399,6 @@ proABA.append(TNIA10_5x64)
 # proABA.append(TNA19_108)
 
 
-noms = ["NIA8_1064", "TNIA5_864", "TNIA5_1064"]
+noms = ["NIA8_1064", "TNIA7_864", "TNIA7_1064"]
 # noms = ["NIA8_1064", "NIA13_10864", "RNIA12_1086"]
 # noms = ["SS35", "NIA8_1064", "NA19"]
