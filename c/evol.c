@@ -83,6 +83,8 @@ void evolABAsc(quad * z, int nz, quad * params, int np, int Nm, quad h, quad * a
 	fprintf(arxiu, "%.34Qe %.34Qe %.34Qe %.34Qe ", t + h*sumcP, H0, HF, erH);
 	if (preprint != NULL)
 	  preprint(zp, zc, params, np);
+	else
+	  copy(zp, zc, nz);
 	for (j = 0; j < nz - 1; j++)
 	  fprintf(arxiu, "%.34Qe ", zp[j]);
 	fprintf(arxiu, "%.34Qe\n", zp[nz - 1]);

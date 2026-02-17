@@ -51,8 +51,8 @@ if __name__ == "__main__":
     max_prcs = 25
     manager = mupr.Manager()
     valpr = manager.dict()  
-    # T, N = 50*2*np.pi, (10**np.linspace(4.0, 7.0, 25)).astype(int)
-    T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 15)).astype(int)
+    T, N = 50*2*np.pi, (10**np.linspace(4.0, 7.0, 25)).astype(int)
+    # T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 15)).astype(int)
     exc, eps, alp = 0.8, 1e-4, 1.0
     zini, params = inikpert(exc, eps, alp)
     hoq = 0
