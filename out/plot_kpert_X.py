@@ -37,25 +37,23 @@ if __name__ == "__main__":
     lin = []
     for i in range(len(f)):
         lin.append(list(map(linia2list, f[i].readlines())))
-
-    
         
-    j = 0
-    ini = 4 # 10 si no contem el sol
-    npl = (len(lin1[0]) - ini)//6
-    x, y = [], [[] for _ in range(npl)]
-    for i in range(len(lin1)):
-        while lin2[j][0] < lin1[i][0]:
-            j += 1
-        x.append(lin1[i][0])
-        for k in range(npl):
-            pos = ini + 2*k
-            y[k].append(difnorm2(lin1[i][pos:pos + 3], lin2[j][pos:pos + 3]))
-    f1.close()
-    f2.close()
+    x_tot, y_tot = [], []
+    for i in range(1, len(lin)):
+        x, y = [], []
+        j = 0
+        for k in range(len(lin[i])):
+            while lin[0][j][0] < lin[i][k][0]:
+                j += 1
+            if abs(lin[0][j - 1][0] - lin[i][k][0]) < 1e-8:
+                x.append(lin[0][j - 1][0])
+                y.append(difnorm2(lin[0][j - 1][4:6], lin[i][k][4:6]))
+                # print(i, lin[0][j - 1][0], lin[i][k][0], lin[0][j - 1][4:6], lin[i][k][4:6])
+        x_tot.append(x)
+        y_tot.append(y)
     
-    for i in range(npl):
-        plt.plot(np.log10(x), np.log10(y[i]), linewidth = 1.5, label = "Planeta " + str(i))
+    for i in range(len(x_tot)):
+        plt.plot(np.log10(x_tot[i]), np.log10(y_tot[i]), linewidth = 1.5, label = arxius[i + 1])
     plt.legend()
     plt.savefig("erX.pdf", format='pdf')
     plt.show()
