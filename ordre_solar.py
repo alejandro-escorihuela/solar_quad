@@ -20,13 +20,13 @@ from evol import *
 #plt.rcParams['figure.dpi'] = 288
 
 def prc_evol(val, pid, valors):
-    zini, rk, Nm, h, nex, hoq = val
+    zini, rk, Nm, h, nex, hoq, par = val
     a, b = cofABA[rk]
     x, y = proABA[rk][:len(proABA[rk])//2], proABA[rk][len(proABA[rk])//2:]
     if hoq == 0:
-        lerH, lerQ = evolABAsolar_errH(zini, params, Nm, h, a, b, x, y), np.nan
+        lerH, lerQ = evolABAsolar_errH(zini, par, Nm, h, a, b, x, y), np.nan
     elif hoq == 1:
-        lerH, lerQ = evolABAsolar_errHQ(zini, params, Nm, h, a, b, x, y)
+        lerH, lerQ = evolABAsolar_errHQ(zini, par, Nm, h, a, b, x, y)
     valors[pid] = [rk, nex, len(b), Nm, h, pid, lerH, lerQ]
 
 def ordenar_par(e):
@@ -55,9 +55,9 @@ if __name__ == "__main__":
     # T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
     # T, N = 2e5, (10**np.linspace(0.1, 5.0, 25)).astype(int)
     # quins = [1, 0, 0, 0, 0, 0, 1]
-    quins = [1, 0, 0, 0, 0, 0, 1, 1]
+    # quins = [1, 0, 0, 0, 0, 0, 1, 1]
     # quins = [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
-    # quins = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    quins = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     zini, params, planetes = iniSS(quins)
     hoq = 1
     titols = "Sistema Solar"
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         prcs = []
         valpr.clear() # Necessari si pr no té sempre els mateixos valors
         for pr in range(i*max_prcs, min((i + 1)*max_prcs, len(v_par))):
-            x = mupr.Process(target = prc_evol, args=([zini.copy(), v_par[pr][0], v_par[pr][2], v_par[pr][3], v_par[pr][4], hoq], pr, valpr))
+            x = mupr.Process(target = prc_evol, args=([zini.copy(), v_par[pr][0], v_par[pr][2], v_par[pr][3], v_par[pr][4], hoq, params], pr, valpr))
             prcs.append(x)
             x.daemon = True
             x.start()
@@ -109,8 +109,12 @@ if __name__ == "__main__":
 
     # Dibuixem les gràfiques
     print("Preparant les gràfiques")
-    for i in range(len(errkv)):
-        plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10) + "--", marker = "o", markersize=7.5, linewidth=1.5, label = noms[i % len(noms)])
+    if (len(N) <= 25):
+        for i in range(len(errkv)):
+            plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10) + "--", marker = "o", markersize=7.5, linewidth=1.5, label = noms[i % len(noms)])
+    else:
+        for i in range(len(errkv)):
+            plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10), label = noms[i % len(noms)])             
     plt.title(titols)
     plt.xlabel(r"$\log_{10}(s/h)$")
     if hoq == 0:

@@ -12,6 +12,7 @@ import numpy as np
 import sys
 sys.path.insert(0, './py')
 from metsNIA import *
+from solar import *
 from kpert import *
 from evol import *
 
@@ -20,13 +21,19 @@ from evol import *
 #plt.rcParams['figure.dpi'] = 288
 
 def prc_evol(val, pid, valors):
-    zini, rk, Nm, h, nex, hoq = val
+    prob, zini, rk, Nm, h, nex, hoq, par = val
     a, b = cofABA[rk]
     x, y = proABA[rk][:len(proABA[rk])//2], proABA[rk][len(proABA[rk])//2:]
-    if hoq == 0:
-        lerH, lerQ = evolABAkpert_errH(zini, params, Nm, h, a, b, x, y), np.nan
-    elif hoq == 1:
-        lerH, lerQ = evolABAkpert_errHQ(zini, params, Nm, h, a, b, x, y)
+    if prob == "solar":
+        if hoq == 0:
+            lerH, lerQ = evolABAsolar_errH(zini, par, Nm, h, a, b, x, y), np.nan
+        elif hoq == 1:
+            lerH, lerQ = evolABAsolar_errHQ(zini, par, Nm, h, a, b, x, y)        
+    elif prob == "kpert":
+        if hoq == 0:
+            lerH, lerQ = evolABAkpert_errH(zini, par, Nm, h, a, b, x, y), np.nan
+        elif hoq == 1:
+            lerH, lerQ = evolABAkpert_errHQ(zini, par, Nm, h, a, b, x, y)
     valors[pid] = [rk, nex, len(b), Nm, h, pid, lerH, lerQ]
 
 def ordenar_par(e):
@@ -50,15 +57,30 @@ def print_info(pr, rk, nex, n, Nm, s, h, err1, err2):
 if __name__ == "__main__":
     max_prcs = 25
     manager = mupr.Manager()
-    valpr = manager.dict()  
-    T, N = 50*2*np.pi, (10**np.linspace(4.0, 7.0, 25)).astype(int)
-    # T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 15)).astype(int)
-    exc, eps, alp = 0.8, 1e-4, 1.0
-    zini, params = inikpert(exc, eps, alp)
-    hoq = 0
-    titols = "Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc)
-    print(titols)
-    print("z₀ =", zini)
+    valpr = manager.dict()
+    prob = "solar"
+    if prob == "solar":
+        T, N = 1e4, (10**np.linspace(2.0, 6.0, 25)).astype(int)
+        # T, N = 1e4, (10**np.linspace(0.1, 4.5, 15)).astype(int)
+        # T, N = 2e5, (10**np.linspace(0.1, 5.0, 25)).astype(int)
+        # quins = [1, 0, 0, 0, 0, 0, 1]
+        # quins = [1, 0, 0, 0, 0, 0, 1, 1]
+        # quins = [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+        quins = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        zini, params, planetes = iniSS(quins)
+        hoq = 1
+        titols = "Sistema Solar"
+        print(titols + ": " + ", ".join(planetes))        
+    elif prob == "kpert":
+        # T, N = 50*2*np.pi, (10**np.linspace(4.0, 7.0, 25)).astype(int)
+        T, N = 50*2*np.pi, (10**np.linspace(5.5, 6.5, 100)).astype(int)
+        # T, N = 50*2*np.pi, (10**np.linspace(4.0, 5.0, 15)).astype(int)
+        exc, eps, alp = 0.8, 1e-4, 1.0
+        zini, params = inikpert(exc, eps, alp)
+        hoq = 1
+        titols = "Kepler pertorbat ϵ = %s, α = %s, e = %f" % (params[0], params[1], exc)
+        print(titols)
+        print("z₀ =", zini)
 
     # Preparem un vector de paràmetres per a executar en paraŀlel
     v_par = []
@@ -84,7 +106,7 @@ if __name__ == "__main__":
         prcs = []
         valpr.clear() # Necessari si pr no té sempre els mateixos valors
         for pr in range(i*max_prcs, min((i + 1)*max_prcs, len(v_par))):
-            x = mupr.Process(target = prc_evol, args=([zini.copy(), v_par[pr][0], v_par[pr][2], v_par[pr][3], v_par[pr][4], hoq], pr, valpr))
+            x = mupr.Process(target = prc_evol, args=([prob, zini.copy(), v_par[pr][0], v_par[pr][2], v_par[pr][3], v_par[pr][4], hoq, params], pr, valpr))
             prcs.append(x)
             x.daemon = True
             x.start()
@@ -106,8 +128,12 @@ if __name__ == "__main__":
     
     # Dibuixem les gràfiques
     print("Preparant les gràfiques")
-    for i in range(len(errkv)):
-        plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10) + "--", marker = "o", markersize=7.5, linewidth=1.5, label = noms[i % len(noms)])
+    if (len(N) <= 25):
+        for i in range(len(errkv)):
+            plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10) + "--", marker = "o", markersize=7.5, linewidth=1.5, label = noms[i % len(noms)])
+    else:
+        for i in range(len(errkv)):
+            plt.plot(np.log10(navav[i]), errkv[i], "C" + str(i%10), label = noms[i % len(noms)])        
     plt.title(titols)
     plt.xlabel(r"$\log_{10}(s/h)$")
     if hoq == 0:
